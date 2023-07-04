@@ -16,14 +16,15 @@ export const getFilesController = async (_req: Request, res: Response, next: Nex
 export const createFileController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const uuid = uuidv4()
-    const { nombreArchivo, awsObjectKey, awsBucket, awsRegion } = req.body
+    const { nombreArchivo, awsObjectKey, awsBucket, awsRegion, tenantId } = req.body
 
     const newFile = await createFileService({
       uuid,
       nombreArchivo,
       awsObjectKey,
       awsBucket,
-      awsRegion
+      awsRegion,
+      tenantId
     })
 
     res.json(newFile)

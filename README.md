@@ -12,10 +12,7 @@ Una vez que se cargue el archivo en el bucket, la API generará una URL de acces
 
 ## Descargar Repositorio
 ### HTTPS
-`git clone https://github.com/LeonardoHOjeda/AWS-S3-API-NODE-PRISMA.git`
-
-### Github CLI
-`gh repo clone LeonardoHOjeda/AWS-S3-API-NODE-PRISMA`
+`git clone https://github.com/LeonardoHOjeda/AWS-S3-API.git`
 
 ## Instalar dependencias de desarrollo
 
@@ -36,6 +33,7 @@ Una vez descargado el repositorio, ejecutar el siguiente comando
 - [module-alias](https://www.npmjs.com/package/module-alias)
 - [tsc-watch](https://www.npmjs.com/package/tsc-watch)
 - [typescript](https://www.npmjs.com/package/typescript)
+- [uuid](https://www.npmjs.com/package/uuid)
 
 ## ESLint usado
 
