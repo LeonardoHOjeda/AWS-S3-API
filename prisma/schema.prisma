@@ -14,10 +14,21 @@ model Archivo {
   id            Int      @id @default(autoincrement())
   uuid          String   @unique
   nombreArchivo String   @map(name: "nombre_archivo")
-  awsKey        String   @map(name: "aws_key")
+  awsObjectKey  String   @map(name: "aws_object_key")
   awsBucket     String   @map(name: "aws_bucket")
   awsRegion     String   @map(name: "aws_region")
   createdAt     DateTime @default(dbgenerated("NOW()")) @map(name: "created_at")
+  tenantId      Int      @map(name: "tenant_id")
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
 
   @@map("archivos")
+}
+
+model Tenant {
+  id      Int       @id @default(autoincrement())
+  uuid    String    @unique
+  nombre  String    @unique
+  Archivo Archivo[]
+
+  @@map("tenants")
 }
