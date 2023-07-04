@@ -7,7 +7,7 @@ import { createFileService, getFilesService } from './archivos.service'
 import { getTenantByIdService } from '@modules/tenants/tenants.service'
 import config from '@config/config'
 import fileUpload from 'express-fileupload'
-import { uploadFileToS3Service } from '@modules/aws/aws.service'
+import { getFileSignedUrlFromS3Service, uploadFileToS3Service } from '@modules/aws/aws.service'
 // import { uploadFileToS3Service } from '@modules/aws/aws.service'
 
 export const getFilesController = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -15,6 +15,17 @@ export const getFilesController = async (_req: Request, res: Response, next: Nex
     const files = await getFilesService()
 
     res.json(files)
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getFilesFromAwsController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const fileName = req.params.fileName
+    const presignedFile = await getFileSignedUrlFromS3Service(fileName)
+
+    res.json(presignedFile)
   } catch (error) {
     next(error)
   }
@@ -28,17 +39,17 @@ export const createFileController = async (req: Request, res: Response, next: Ne
     const file = req.files!.file as fileUpload.UploadedFile
     const fileName = file.name
     const fileExtension = path.extname(fileName)
-    const awsFileName = `${uuid}${fileExtension}`
 
     const getTenantUuid = await getTenantByIdService(tenantId)
     if (getTenantUuid == null) {
       throw new Error('Tenant no encontrado')
     }
+    const awsFileName = `${uuid}${fileExtension}`
     const awsObjectKey = `${getTenantUuid?.nombre}/${awsFileName}`
     const awsBucket = config.AWS.BUCKET_NAME!
     const awsRegion = config.AWS.BUCKET_REGION!
 
-    await uploadFileToS3Service(file, awsFileName)
+    await uploadFileToS3Service(file, awsObjectKey)
 
     const newFile = await createFileService({
       uuid,

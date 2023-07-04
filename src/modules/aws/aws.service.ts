@@ -52,6 +52,8 @@ export async function downloadFileFromS3Service (fileName: string): Promise<any>
 export async function uploadFileToS3Service (file: fileUpload.UploadedFile, fileName: string): Promise<any> {
   const stream = fs.createReadStream(file.tempFilePath)
 
+  console.log('FileName: ', fileName)
+
   const uploadParams = {
     Bucket: config.AWS.BUCKET_NAME!,
     Key: fileName,

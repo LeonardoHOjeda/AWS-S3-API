@@ -20,7 +20,7 @@ export async function createFileService (data: Omit<Archivo, 'id' | 'createdAt'>
       awsObjectKey: data.awsObjectKey,
       awsBucket: data.awsBucket,
       awsRegion: data.awsRegion,
-      tenantUuid: data.tenantUuid // Utiliza `tenant` en lugar de `tenantId`
+      tenantUuid: data.tenantUuid
     }
   })
 
