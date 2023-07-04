@@ -18,8 +18,8 @@ model Archivo {
   awsBucket     String   @map(name: "aws_bucket")
   awsRegion     String   @map(name: "aws_region")
   createdAt     DateTime @default(dbgenerated("NOW()")) @map(name: "created_at")
-  tenantId      Int      @map(name: "tenant_id")
-  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  tenantUuid    String   @map(name: "tenant_uuid")
+  tenant        Tenant   @relation(fields: [tenantUuid], references: [uuid])
 
   @@map("archivos")
 }

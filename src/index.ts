@@ -13,8 +13,8 @@ class Server {
     this.app = express()
     this.port = config.PORT
 
-    this.routes()
     this.middlewares()
+    this.routes()
   }
 
   start (): void {

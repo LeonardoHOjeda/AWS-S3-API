@@ -3,6 +3,7 @@ import { S3Client, PutObjectCommand, ListObjectsCommand, GetObjectCommand } from
 import config from '../../config/config'
 import { Readable } from 'stream'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import fileUpload from 'express-fileupload'
 
 const clientS3 = new S3Client({
   region: config.AWS.BUCKET_REGION,
@@ -48,13 +49,12 @@ export async function downloadFileFromS3Service (fileName: string): Promise<any>
   readableStream.pipe(writeStream)
 }
 
-export async function uploadFileToS3Service (file: any): Promise<any> {
-  // TODO Almacenar en la base de datos la URL prefirmada
+export async function uploadFileToS3Service (file: fileUpload.UploadedFile, fileName: string): Promise<any> {
   const stream = fs.createReadStream(file.tempFilePath)
 
   const uploadParams = {
     Bucket: config.AWS.BUCKET_NAME!,
-    Key: file.name,
+    Key: fileName,
     Body: stream
   }
 
