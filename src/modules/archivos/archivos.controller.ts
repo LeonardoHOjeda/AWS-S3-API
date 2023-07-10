@@ -29,8 +29,7 @@ export const getFileBytesFromAWSController = async (req: Request, res: Response,
     const uuid = req.params.uuid
     const file = await downloadFileFromS3(uuid)
 
-    res.setHeader('Content-Type', 'image/png')
-
+    res.setHeader('Content-Type', file.ContentType)
     res.setHeader('Content-Disposition', `attachment; filename="${file.Key}"`)
 
     file.Body?.pipe(res)
