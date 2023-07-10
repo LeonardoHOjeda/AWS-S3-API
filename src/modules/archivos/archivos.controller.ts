@@ -3,14 +3,13 @@
 import { NextFunction, Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
+import { PutObjectCommandInput } from '@aws-sdk/client-s3'
 import fileUpload from 'express-fileupload'
 import { createFileService, getFilesService } from './archivos.service'
 import { getTenantByIdService } from '@modules/tenants/tenants.service'
 import config from '@config/config'
-import { getFileSignedUrlFromS3Service, uploadFileToS3Service, uploadURLToS3Service } from '@modules/aws/aws.service'
+import { downloadFileFromS3, getFileSignedUrlFromS3Service, uploadFileToS3Service, uploadURLToS3Service } from '@modules/aws/aws.service'
 import { HTTPError } from '@middlewares/error_handler'
-import '../../extensions/string.extensions'
-import { PutObjectCommandInput } from '@aws-sdk/client-s3'
 
 export const getFilesController = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -23,7 +22,26 @@ export const getFilesController = async (_req: Request, res: Response, next: Nex
 }
 
 /**
- * ? Funcion para obtener un presigned URL de AWS S3 por el Tenant y el UUID del archivo
+ * ? Funcion para obtener un archivo de AWS S3 (File)
+ */
+export const getFileBytesFromAWSController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const uuid = req.params.uuid
+    const file = await downloadFileFromS3(uuid)
+
+    res.setHeader('Content-Type', 'image/png')
+
+    res.setHeader('Content-Disposition', `attachment; filename="${file.Key}"`)
+
+    file.Body?.pipe(res)
+  } catch (error) {
+    console.error(error)
+    next(error)
+  }
+}
+
+/**
+ * ? Funcion para obtener un archivo con un presigned URL de AWS S3 por el Tenant y el UUID del archivo
  */
 export const getFilesFromAwsController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -117,16 +135,7 @@ export const createPresignedURLtoUploadFile = async (req: Request, res: Response
 
     const presignedURL = await uploadURLToS3Service(s3params)
 
-    // const newFile = await createFileService({
-    //   uuid,
-    //   nombreArchivo: fileName,
-    //   awsObjectKey,
-    //   awsBucket,
-    //   awsRegion,
-    //   tenantUuid: getTenantUuid.uuid
-    // })
-
-    res.json({ presignedURL, key: Key })
+    res.json({ presignedURL, key: Key, uuid })
   } catch (error) {
     console.log(error)
 

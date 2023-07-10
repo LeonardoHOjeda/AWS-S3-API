@@ -1,9 +1,10 @@
-import fs from 'fs'
-import { S3Client, PutObjectCommand, ListObjectsCommand, GetObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3'
-import config from '../../config/config'
-import { Readable } from 'stream'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { Readable } from 'stream'
+import { S3Client, PutObjectCommand, ListObjectsCommand, GetObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3'
 import fileUpload from 'express-fileupload'
+import fs from 'fs'
+import config from '../../config/config'
+import { getSingleFileService } from '@modules/archivos/archivos.service'
 
 const clientS3 = new S3Client({
   region: config.AWS.BUCKET_REGION,
@@ -55,8 +56,19 @@ export async function downloadFileFromS3Service (fileName: string): Promise<any>
   readableStream.pipe(writeStream)
 }
 
-/** SUBIDA DE ARCHIVOS **/
+// ? Descargar un archivo de AWS
+export async function downloadFileFromS3 (uuid: string): Promise<any> {
+  const getFileByUUID = await getSingleFileService(uuid)
 
+  const fileName = getFileByUUID?.awsObjectKey
+  const command = getObjectCommand(fileName!)
+
+  const data = await clientS3.send(command)
+
+  return data
+}
+
+/** SUBIDA DE ARCHIVOS **/
 // ? Subir un archivo a AWS S3 usando un presigned URL
 export async function uploadURLToS3Service (uploadParams: PutObjectCommandInput): Promise<any> {
   const command = new PutObjectCommand(uploadParams)

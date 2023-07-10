@@ -10,6 +10,15 @@ export async function getFilesService (): Promise<Archivo[]> {
   return getFiles
 }
 
+// ? Obtener un solo archivo de la BD por el UUID
+export async function getSingleFileService (uuid: string): Promise<Archivo | null> {
+  const singleFile = await prisma.archivo.findFirst({
+    where: { uuid }
+  })
+
+  return singleFile
+}
+
 // ? Subir archivos a AWS S3 y guardar en BD (File)
 export async function createFileService (data: Omit<Archivo, 'id' | 'createdAt'>): Promise<Archivo> {
   // const stream = fs.createReadStream(file.tempFilePath)
