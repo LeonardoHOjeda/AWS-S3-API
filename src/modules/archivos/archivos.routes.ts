@@ -5,7 +5,7 @@ import { createFileController, getFilesController, getFilesFromAwsController } f
 const router = Router()
 
 router.get('/', getFilesController)
-router.get('/presignedFile/:fileName', getFilesFromAwsController)
+router.get('/presignedFile/:folder/:fileName', getFilesFromAwsController)
 
 router.post('/uploadFile', createFileController)
 

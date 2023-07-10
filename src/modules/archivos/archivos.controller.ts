@@ -22,8 +22,10 @@ export const getFilesController = async (_req: Request, res: Response, next: Nex
 
 export const getFilesFromAwsController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
+    const folder = req.params.folder
     const fileName = req.params.fileName
-    const presignedFile = await getFileSignedUrlFromS3Service(fileName)
+    const path = `${folder}/${fileName}`
+    const presignedFile = await getFileSignedUrlFromS3Service(path)
 
     res.json(presignedFile)
   } catch (error) {
