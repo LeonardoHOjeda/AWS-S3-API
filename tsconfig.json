@@ -13,6 +13,7 @@
       "@middlewares/*": ["middlewares/*"],
       "@config/*": ["config/*"],
     },
+    "typeRoots": ["@types", "node_modules/@types"],
 
     /* Emit */
     "outDir": "./build",
@@ -27,6 +28,6 @@
 
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "@types/index.d.ts"],
   "exclude": ["node_modules", "build"]
 }

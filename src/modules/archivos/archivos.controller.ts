@@ -3,12 +3,14 @@
 import { NextFunction, Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
+import fileUpload from 'express-fileupload'
 import { createFileService, getFilesService } from './archivos.service'
 import { getTenantByIdService } from '@modules/tenants/tenants.service'
 import config from '@config/config'
-import fileUpload from 'express-fileupload'
-import { getFileSignedUrlFromS3Service, uploadFileToS3Service } from '@modules/aws/aws.service'
-// import { uploadFileToS3Service } from '@modules/aws/aws.service'
+import { getFileSignedUrlFromS3Service, uploadFileToS3Service, uploadURLToS3Service } from '@modules/aws/aws.service'
+import { HTTPError } from '@middlewares/error_handler'
+import '../../extensions/string.extensions'
+import { PutObjectCommandInput } from '@aws-sdk/client-s3'
 
 export const getFilesController = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -20,11 +22,15 @@ export const getFilesController = async (_req: Request, res: Response, next: Nex
   }
 }
 
+/**
+ * ? Funcion para obtener un presigned URL de AWS S3 por el Tenant y el UUID del archivo
+ */
 export const getFilesFromAwsController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const folder = req.params.folder
     const fileName = req.params.fileName
     const path = `${folder}/${fileName}`
+
     const presignedFile = await getFileSignedUrlFromS3Service(path)
 
     res.json(presignedFile)
@@ -33,6 +39,9 @@ export const getFilesFromAwsController = async (req: Request, res: Response, nex
   }
 }
 
+/**
+ * ? Funcion para subir un archivo a AWS S3 (File)
+ */
 export const createFileController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { tenantId } = req.body
@@ -65,6 +74,62 @@ export const createFileController = async (req: Request, res: Response, next: Ne
     res.json(newFile)
   } catch (error) {
     console.log(error)
+    next(error)
+  }
+}
+
+/**
+ * ? Funcion para subir un archivo a AWS S3 usando un presigned URL
+ */
+export const createPresignedURLtoUploadFile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { tenantId } = req.body
+    const fileExtension: string = req.query.fileType?.toString() as string
+
+    const uuid = uuidv4()
+    const getTenantUuid = await getTenantByIdService(tenantId)
+
+    if (getTenantUuid == null) {
+      throw new HTTPError(404, 'Tenant no encontrado')
+    }
+
+    const Key = `${getTenantUuid.nombre}/${uuid}.${fileExtension}`
+
+    let contentType
+    if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
+      contentType = 'image/' + fileExtension
+    } else if (['pdf'].includes(fileExtension)) {
+      contentType = 'application/pdf'
+    } else if (['doc', 'docx'].includes(fileExtension)) {
+      contentType = 'application/msword'
+    } else if (['xls', 'xlsx'].includes(fileExtension)) {
+      contentType = 'application/vnd.ms-excel'
+    } else {
+      contentType = 'application/octet-stream'
+    }
+
+    const s3params: PutObjectCommandInput = {
+      Bucket: config.AWS.BUCKET_NAME!,
+      Key,
+      Body: undefined,
+      ContentType: contentType
+    }
+
+    const presignedURL = await uploadURLToS3Service(s3params)
+
+    // const newFile = await createFileService({
+    //   uuid,
+    //   nombreArchivo: fileName,
+    //   awsObjectKey,
+    //   awsBucket,
+    //   awsRegion,
+    //   tenantUuid: getTenantUuid.uuid
+    // })
+
+    res.json({ presignedURL, key: Key })
+  } catch (error) {
+    console.log(error)
+
     next(error)
   }
 }
