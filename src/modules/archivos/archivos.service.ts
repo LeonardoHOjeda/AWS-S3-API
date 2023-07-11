@@ -21,8 +21,6 @@ export async function getSingleFileService (uuid: string): Promise<Archivo | nul
 
 // ? Subir archivos a AWS S3 y guardar en BD (File)
 export async function createFileService (data: Omit<Archivo, 'id' | 'createdAt'>): Promise<Archivo> {
-  // const stream = fs.createReadStream(file.tempFilePath)
-
   const createFile = await prisma.archivo.create({
     data: {
       uuid: data.uuid,
