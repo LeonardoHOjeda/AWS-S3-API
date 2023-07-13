@@ -12,7 +12,7 @@ Una vez que se cargue el archivo en el bucket, la API generará una URL de acces
 
 ## Descargar Repositorio
 ### HTTPS
-`git clone https://github.com/LeonardoHOjeda/AWS-S3-API.git`
+`git clone https://gitlab.gobdigital.com/nomina/aws-s3-api`
 
 ## Instalar dependencias de desarrollo
 
