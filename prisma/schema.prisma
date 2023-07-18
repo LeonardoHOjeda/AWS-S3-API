@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -25,10 +26,11 @@ model Archivo {
 }
 
 model Tenant {
-  id      Int       @id @default(autoincrement())
-  uuid    String    @unique
-  nombre  String    @unique
-  Archivo Archivo[]
+  id               Int       @id @default(autoincrement())
+  uuid             String    @unique
+  nombre           String    @unique
+  presignedURLTime Int       @map(name: "presigned_url_time")
+  Archivo          Archivo[]
 
   @@map("tenants")
 }

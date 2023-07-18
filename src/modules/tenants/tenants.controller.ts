@@ -19,7 +19,8 @@ export const createTenantController = async (req: Request, res: Response, next: 
     const { nombre } = req.body
     const newTenant = await createTenantService({
       uuid,
-      nombre
+      nombre,
+      presignedURLTime: 3000
     })
 
     res.json(newTenant)

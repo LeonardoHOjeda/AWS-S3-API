@@ -45,3 +45,9 @@ Una vez descargado el repositorio, ejecutar el siguiente comando
 ## Prettier
 - [ts-prettier-plugin-prisma](https://www.npmjs.com/package/ts-standard)
 
+## Docker Build
+Crear la imagen de docker
+`docker build -t registry.gobdigital.com/nomina/aws-s3-api:VERSION_NAME .`
+
+Subir la imagen de docker
+`docker push registry.gobdigital.com/nomina/aws-s3-api:VERSION_NAME`
