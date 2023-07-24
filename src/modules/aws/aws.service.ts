@@ -79,15 +79,11 @@ export async function uploadURLToS3Service (uploadParams: PutObjectCommandInput)
 }
 
 // ? Subir un archivo a AWS S3 (File)
-export async function uploadFileToS3Service (file: any, fileName: string): Promise<any> {
-  const stream = fs.createReadStream(file.tempFilePath)
-
-  console.log('FileName: ', fileName)
-
+export async function uploadFileToS3Service (file: Express.Multer.File, fileName: string): Promise<any> {
   const uploadParams = {
     Bucket: config.AWS.BUCKET_NAME!,
     Key: fileName,
-    Body: stream
+    Body: file.buffer
   }
 
   const command = new PutObjectCommand(uploadParams)
@@ -102,5 +98,8 @@ export async function uploadMultipleFilesToS3 (file: Express.Multer.File, tenant
   }
 
   const command = new PutObjectCommand(params)
-  return await clientS3.send(command)
+  await clientS3.send(command)
+  console.log(uuid)
+
+  return uuid
 }
