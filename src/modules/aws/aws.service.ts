@@ -1,7 +1,6 @@
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { Readable } from 'stream'
 import { S3Client, PutObjectCommand, ListObjectsCommand, GetObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3'
-import fileUpload from 'express-fileupload'
 import fs from 'fs'
 import config from '../../config/config'
 import { getSingleFileService } from '@modules/archivos/archivos.service'
@@ -80,7 +79,7 @@ export async function uploadURLToS3Service (uploadParams: PutObjectCommandInput)
 }
 
 // ? Subir un archivo a AWS S3 (File)
-export async function uploadFileToS3Service (file: fileUpload.UploadedFile, fileName: string): Promise<any> {
+export async function uploadFileToS3Service (file: any, fileName: string): Promise<any> {
   const stream = fs.createReadStream(file.tempFilePath)
 
   console.log('FileName: ', fileName)
@@ -92,5 +91,16 @@ export async function uploadFileToS3Service (file: fileUpload.UploadedFile, file
   }
 
   const command = new PutObjectCommand(uploadParams)
+  return await clientS3.send(command)
+}
+
+export async function uploadMultipleFilesToS3 (file: Express.Multer.File, tenantId: string, uuid: string): Promise <any> {
+  const params = {
+    Bucket: config.AWS.BUCKET_NAME!,
+    Key: `${tenantId}/${uuid}-${file.originalname}`,
+    Body: file.buffer
+  }
+
+  const command = new PutObjectCommand(params)
   return await clientS3.send(command)
 }

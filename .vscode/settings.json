@@ -26,4 +26,5 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "Prisma.prisma"
   },
+  "editor.formatOnSave": false
 }

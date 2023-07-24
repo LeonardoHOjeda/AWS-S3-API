@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Request, Response, RequestHandler } from 'express'
 import { v4 as uuidv4 } from 'uuid'
-import path from 'path'
+// import path from 'path'
 import { PutObjectCommandInput } from '@aws-sdk/client-s3'
-import fileUpload from 'express-fileupload'
+// import fileUpload from 'express-fileupload'
 import { createFileService, getFilesService } from './archivos.service'
+// import { getFilesService } from './archivos.service'
 import { getTenantByIdService } from '@modules/tenants/tenants.service'
 import config from '@config/config'
-import { downloadFileFromS3, getFileSignedUrlFromS3Service, uploadFileToS3Service, uploadURLToS3Service } from '@modules/aws/aws.service'
+// import { downloadFileFromS3, getFileSignedUrlFromS3Service, uploadFileToS3Service, uploadURLToS3Service } from '@modules/aws/aws.service'
+import { downloadFileFromS3, getFileSignedUrlFromS3Service, uploadMultipleFilesToS3, uploadURLToS3Service } from '@modules/aws/aws.service'
 import { HTTPError } from '@middlewares/error_handler'
 
 export const getFilesController = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -59,38 +61,81 @@ export const getFilesFromAwsController = async (req: Request, res: Response, nex
 /**
  * ? Funcion para subir un archivo a AWS S3 (File)
  */
-export const createFileController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const createFileController = async (_req: Request, _res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { tenantId } = req.body
+    // const { tenantId } = req.body
+    // console.log('Req: ', req.files![0])
 
-    const uuid = uuidv4()
-    const file = req.files!.file as fileUpload.UploadedFile
-    const fileName = file.name
-    const fileExtension = path.extname(fileName)
+    // const uuid = uuidv4()
+    // const file = req.files!.file
+    // const fileName = file.name
+    // const fileExtension = path.extname(fileName)
+
+    // const getTenantUuid = await getTenantByIdService(tenantId)
+    // if (getTenantUuid == null) {
+    //   throw new Error('Tenant no encontrado')
+    // }
+    // // const awsFileName = `${uuid}${fileExtension}`
+    // // const awsObjectKey = `${getTenantUuid?.nombre}/${awsFileName}`
+    // // const awsBucket = config.AWS.BUCKET_NAME!
+    // // const awsRegion = config.AWS.BUCKET_REGION!
+
+    // // await uploadFileToS3Service(file, awsObjectKey)
+
+    // const newFile = await createFileService({
+    //   uuid,
+    //   nombreArchivo: fileName,
+    //   awsObjectKey,
+    //   awsBucket,
+    //   awsRegion,
+    //   tenantUuid: getTenantUuid.uuid
+    // })
+
+    // res.json(newFile)
+  } catch (error) {
+    console.log(error)
+    next(error)
+  }
+}
+
+export const createMultipleFiles: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    console.log('Require: ', req.files)
+
+    const { tenantId } = req.body
+    const files = req.files as unknown as Express.Multer.File[]
 
     const getTenantUuid = await getTenantByIdService(tenantId)
     if (getTenantUuid == null) {
       throw new Error('Tenant no encontrado')
     }
-    const awsFileName = `${uuid}${fileExtension}`
-    const awsObjectKey = `${getTenantUuid?.nombre}/${awsFileName}`
-    const awsBucket = config.AWS.BUCKET_NAME!
-    const awsRegion = config.AWS.BUCKET_REGION!
 
-    await uploadFileToS3Service(file, awsObjectKey)
+    // Generar el nombre del archivo
+    files.forEach(async (file) => {
+      console.log('File: ', file)
 
-    const newFile = await createFileService({
-      uuid,
-      nombreArchivo: fileName,
-      awsObjectKey,
-      awsBucket,
-      awsRegion,
-      tenantUuid: getTenantUuid.uuid
+      const uuid = uuidv4()
+      const fileName = file.originalname
+
+      // Subir informacion del archivo a la base de datos
+      await createFileService({
+        uuid,
+        nombreArchivo: fileName,
+        awsObjectKey: `${getTenantUuid.nombre}/${uuid}`,
+        awsBucket: config.AWS.BUCKET_NAME!,
+        awsRegion: config.AWS.BUCKET_REGION!,
+        tenantUuid: getTenantUuid.uuid
+      })
+
+      await uploadMultipleFilesToS3(file, getTenantUuid.nombre, uuid)
+
+      console.log('Processed file: ', fileName)
     })
 
-    res.json(newFile)
+    // Subir el archivo a AWS
+    res.status(200).json({ message: 'Archivos procesados correctamente' })
   } catch (error) {
-    console.log(error)
+    console.log('Error en createFile: ', error)
     next(error)
   }
 }
