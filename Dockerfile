@@ -1,3 +1,4 @@
+# STAGE 1: development-deps
 FROM node:16.20-alpine AS development-deps
 WORKDIR /app
 COPY package.json ./
@@ -5,35 +6,31 @@ RUN chown -R node:node .
 USER node
 RUN npm install
 
-FROM node:16.20-alpine AS development
+# STAGE 2: development
+FROM nope:16.20-alpine AS development
 WORKDIR /app
 COPY --from=development-deps /app/node_modules ./node_modules
 COPY . .
 RUN chown -R node:node .
 USER node
-RUN npm run build
-CMD [ "npm", "run", "dev" ]
 
-
+# STAGE 3: builder
 FROM node:16.20-alpine AS builder
 WORKDIR /app
-COPY --from=development-deps /app/node_modules ./node_modules
+COPY package.json ./
 COPY . .
-RUN npm run build
+RUN npm install && npm run build
 
-# PRODUCTION
 FROM node:16.20-alpine AS production-deps
 WORKDIR /app
 COPY package.json ./
-RUN chown -R node:node .
+RUN chown node:node . .
 USER node
 RUN npm install --production
 
-
 FROM node:16.20-alpine AS production
 WORKDIR /app
-COPY --from=production-deps /app/node_modules ./node_modules
+COPY . .
 COPY --from=builder /app/build ./build
-CMD [ "npm", "start" ]
-
-
+COPY --from=production-deps /app/node_modules ./node_modules
+CMD [ "node", "build" ]
