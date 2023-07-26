@@ -1,3 +1,4 @@
+import { HTTPError } from '@middlewares/error_handler'
 import { PrismaClient, Tenant } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -8,12 +9,16 @@ export async function getTenantsService (): Promise<Tenant[]> {
   return getTenants
 }
 
-export async function getTenantByIdService (uuid: string): Promise<Tenant | null> {
+export async function getTenantByIdService (uuid: string): Promise<Tenant> {
   const getTenantById = await prisma.tenant.findUnique({
     where: {
       uuid
     }
   })
+
+  if (getTenantById === null) {
+    throw new HTTPError(404, 'Tenant no encontrado')
+  }
 
   return getTenantById
 }

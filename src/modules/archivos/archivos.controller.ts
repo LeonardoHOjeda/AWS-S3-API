@@ -11,7 +11,6 @@ import { getTenantByIdService } from '@modules/tenants/tenants.service'
 import config from '@config/config'
 import { downloadFileFromS3, getFileSignedUrlFromS3Service, uploadFileToS3Service, uploadMultipleFilesToS3, uploadURLToS3Service } from '@modules/aws/aws.service'
 // import { downloadFileFromS3, getFileSignedUrlFromS3Service, uploadMultipleFilesToS3, uploadURLToS3Service } from '@modules/aws/aws.service'
-import { HTTPError } from '@middlewares/error_handler'
 
 export const getFilesController = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -71,9 +70,7 @@ export const createSingleFile = async (req: Request, res: Response, next: NextFu
     console.log('Files: ', file)
 
     const getTenantUuid = await getTenantByIdService(tenantId)
-    if (getTenantUuid == null) {
-      throw new Error('Tenant no encontrado')
-    }
+
     const awsFileName = `${uuid}${file?.originalname}`
     const awsObjectKey = `${getTenantUuid.nombre}/${awsFileName}`
     const awsBucket = config.AWS.BUCKET_NAME!
@@ -152,13 +149,9 @@ export const createPresignedURLtoUploadFile = async (req: Request, res: Response
     const fileExtension: string = req.query.fileType?.toString() as string
 
     const uuid = uuidv4()
-    const getTenantUuid = await getTenantByIdService(tenantId)
+    const tenant = await getTenantByIdService(tenantId)
 
-    if (getTenantUuid == null) {
-      throw new HTTPError(404, 'Tenant no encontrado')
-    }
-
-    const Key = `${getTenantUuid.nombre}/${uuid}.${fileExtension}`
+    const Key = `${tenant.nombre}/${uuid}.${fileExtension}`
 
     let contentType
     if (['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'].includes(fileExtension)) {
@@ -180,7 +173,7 @@ export const createPresignedURLtoUploadFile = async (req: Request, res: Response
       ContentType: contentType
     }
 
-    const presignedURL = await uploadURLToS3Service(s3params)
+    const presignedURL = await uploadURLToS3Service(tenant, s3params)
 
     res.json({ presignedURL, key: Key, uuid })
   } catch (error) {

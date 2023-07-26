@@ -4,6 +4,7 @@ import { S3Client, PutObjectCommand, ListObjectsCommand, GetObjectCommand, PutOb
 import fs from 'fs'
 import config from '../../config/config'
 import { getSingleFileService } from '@modules/archivos/archivos.service'
+import { Tenant } from '@prisma/client'
 
 const clientS3 = new S3Client({
   region: config.AWS.BUCKET_REGION,
@@ -69,9 +70,9 @@ export async function downloadFileFromS3 (uuid: string): Promise<any> {
 
 /** SUBIDA DE ARCHIVOS **/
 // ? Subir un archivo a AWS S3 usando un presigned URL
-export async function uploadURLToS3Service (uploadParams: PutObjectCommandInput): Promise<any> {
+export async function uploadURLToS3Service (tenant: Tenant, uploadParams: PutObjectCommandInput): Promise<any> {
   const command = new PutObjectCommand(uploadParams)
-  const presignedURL = await getSignedUrl(clientS3, command, { expiresIn: 3600 })
+  const presignedURL = await getSignedUrl(clientS3, command, { expiresIn: tenant.presignedURLTime })
 
   console.log('Presigned URL: ', presignedURL)
 
