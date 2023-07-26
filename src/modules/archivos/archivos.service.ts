@@ -1,3 +1,4 @@
+import { HTTPError } from '@middlewares/error_handler'
 import { Archivo, PrismaClient } from '@prisma/client'
 // import fs from 'fs'
 
@@ -15,6 +16,10 @@ export async function getSingleFileService (uuid: string): Promise<Archivo | nul
   const singleFile = await prisma.archivo.findFirst({
     where: { uuid }
   })
+
+  if (singleFile === null) {
+    throw new HTTPError(404, 'No se encontró el archivo')
+  }
 
   return singleFile
 }

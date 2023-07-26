@@ -2,7 +2,7 @@
 import { Router } from 'express'
 // import { v4 as uuidv4 } from 'uuid'
 import multer from 'multer'
-import { createSingleFile, createMultipleFiles, createPresignedURLtoUploadFile, getFileBytesFromAWSController, getFilesController, getFilesFromAwsController } from './archivos.controller'
+import { createSingleFile, createMultipleFiles, createPresignedURLtoUploadFile, getFileBytesFromAWSController, getFilesController, getFilesFromAwsController, getSingleDataFileByUUID } from './archivos.controller'
 
 const router = Router()
 
@@ -42,5 +42,6 @@ router.post('/uploadFile', uploader.single('file'), createSingleFile)
 router.post('/uploadMultipleFiles', uploader.array('file'), createMultipleFiles)
 // Obtener un archivo de AWS S3 (File)
 router.get('/:uuid', getFileBytesFromAWSController)
+router.get('/single/:uuid', getSingleDataFileByUUID)
 
 export default router
