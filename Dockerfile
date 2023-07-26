@@ -1,4 +1,3 @@
-# STAGE 1: development-deps
 FROM node:16.20-alpine
 WORKDIR /app
 COPY package*.json ./

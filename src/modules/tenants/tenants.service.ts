@@ -25,3 +25,14 @@ export async function createTenantService (data: Omit<Tenant, 'id' | 'Archivo'>)
 
   return createTenant
 }
+
+export async function updateTenant (uuid: string, data: Tenant): Promise<Tenant> {
+  const updateTenant = await prisma.tenant.update({
+    where: {
+      uuid
+    },
+    data
+  })
+
+  return updateTenant
+}
