@@ -78,6 +78,7 @@ export const createSingleFile = async (req: Request, res: Response, next: NextFu
 
     const uuid = uuidv4()
     const file = req.file
+
     const fileExtension = path.extname(file!.originalname)
 
     console.log('Files: ', file)

@@ -17,7 +17,7 @@ export async function getTenantByIdService (uuid: string): Promise<Tenant> {
   })
 
   if (getTenantById === null) {
-    throw new HTTPError(404, 'Tenant no encontrado')
+    throw new HTTPError(404, 'Tenant no encontrado (AWS)')
   }
 
   return getTenantById
