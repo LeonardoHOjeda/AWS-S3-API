@@ -1,5 +1,6 @@
 import './alias'
 import express, { Application } from 'express'
+import cors from 'cors'
 import config from './config/config'
 import router from './routes'
 import { handleErrorMiddleware } from '@middlewares/error_handler'
@@ -31,6 +32,7 @@ class Server {
   // Middlewares
   middlewares (): void {
     this.app.use(express.json())
+    this.app.use(cors())
     this.app.use((_req, res, next) => {
       res.setHeader('Access-Control-Allow-Origin', '*')
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
