@@ -22,7 +22,7 @@ const storage = multer.memoryStorage()
 //   if (file.mimetype.split('/')[0] === 'image' && file.mimetype.split('/')[1] === 'pdf') {
 //     cb(null, true)
 //   } else {
-//     cb(new Error('El archivo no es del formato correcto.'), false)
+//     throw new HTTPError(400, 'El archivo no es del formato correcto.')
 //   }
 // }
 const uploader = multer({ storage })

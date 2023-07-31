@@ -10,6 +10,7 @@ import { createFileService, getFilesService, getSingleFileService } from './arch
 import { getTenantByIdService } from '@modules/tenants/tenants.service'
 import config from '@config/config'
 import { downloadFileFromS3, getFileSignedUrlFromS3Service, uploadFileToS3Service, uploadMultipleFilesToS3, uploadURLToS3Service } from '@modules/aws/aws.service'
+import { HTTPError } from '@middlewares/error_handler'
 // import { downloadFileFromS3, getFileSignedUrlFromS3Service, uploadMultipleFilesToS3, uploadURLToS3Service } from '@modules/aws/aws.service'
 
 export const getFilesController = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -75,11 +76,23 @@ export const getFilesFromAwsController = async (req: Request, res: Response, nex
 export const createSingleFile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { tenantId } = req.body
-
     const uuid = uuidv4()
     const file = req.file
 
+    const maxSizeInBytes = 1 * 1024 * 1024 // 1 MB en bytes
+
+    if (file!.size > maxSizeInBytes) {
+      throw new HTTPError(400, 'El archivo es demasiado grande.')
+    }
+
+    console.log('Req file: ', req.file)
+
+    const allowedExtensions = ['.png', '.pdf', '.jpg', '.jpeg', '.gif']
     const fileExtension = path.extname(file!.originalname)
+
+    if (!allowedExtensions.includes(fileExtension)) {
+      throw new HTTPError(400, 'El archivo tiene una extensión no permitida.')
+    }
 
     console.log('Files: ', file)
 
