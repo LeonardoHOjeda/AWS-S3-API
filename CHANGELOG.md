@@ -13,4 +13,4 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 - Se agrega validación para restringir la subida de archivos que no sean de tipo PDF o imagen.
 
 [Sin liberar]: https://gitlab.gobdigital.com/nomina/aws-s3-api/-/compare/v1.0.12...main
-[1.0.22]: https://gitlab.gobdigital.com/nomina/kiosko_front_react/-/compare/6ea5cbee4828850b408c214c8ef7c5750a63e84d...v1.0.12
+[1.0.12]: https://gitlab.gobdigital.com/nomina/kiosko_front_react/-/compare/6ea5cbee4828850b408c214c8ef7c5750a63e84d...v1.0.12
