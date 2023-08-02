@@ -6,6 +6,14 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin liberar]
+## [1.0.13] - 02-08-2023
+### Agregado
+- Se agregan validacion para restring la subida de archivos que pesen mas de 1 MB cuando se suben múltiples archivos.
+- Se agrega validación para restringir la subida de archivos que no sean de tipo PDF o imagen cuando se suben múltiples archivos.
+
+### Corregido
+- Se corrige el bug que no guardaba la extensión en la base de datos.
+- Se corrige el bug que generaba 2 uuids distintos, uno para la base de datos y otro para el bucket
 
 ## [1.0.12] - 31-07-2023
 ### Agregado

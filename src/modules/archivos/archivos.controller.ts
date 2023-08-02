@@ -125,30 +125,43 @@ export const createMultipleFiles: RequestHandler = async (req: Request, res: Res
   try {
     const { tenantId } = req.body
     const files = req.files as unknown as Express.Multer.File[]
-
     const tenant = await getTenantByIdService(tenantId)
+
+    const maxSizeInBytes = 1 * 1024 * 1024 // 1 MB en bytes
 
     // Generar el nombre del archivo
     const resultados: any[] = []
 
+    // Mapear todos los archivos
     await Promise.all(files.map(async (file) => {
       console.log('File: ', file)
+      if (file.size > maxSizeInBytes) {
+        throw new HTTPError(400, 'El archivo es demasiado grande.')
+      }
+
+      const allowedExtensions = ['.png', '.pdf', '.jpg', '.jpeg', '.gif']
+      const fileExtension = path.extname(file.originalname)
+
+      if (!allowedExtensions.includes(fileExtension)) {
+        throw new HTTPError(400, 'El archivo tiene una extensión no permitida.')
+      }
 
       const uuid = uuidv4()
       const fileName = file.originalname
+      const awsFileName = `${uuid}${fileExtension}`
 
       // Subir informacion del archivo a la base de datos
       await createFileService({
         uuid,
         nombreArchivo: fileName,
-        awsObjectKey: `${tenant.nombre}/${uuid}`,
+        awsObjectKey: `${tenant.nombre}/${awsFileName}`,
         awsBucket: config.AWS.BUCKET_NAME!,
         awsRegion: config.AWS.BUCKET_REGION!,
         tenantUuid: tenant.uuid
       })
 
       // Subir el archivo a AWS
-      const result = await uploadMultipleFilesToS3(file, tenant.nombre, uuid)
+      const result = await uploadMultipleFilesToS3(file, awsFileName, tenant.nombre, uuid)
 
       console.log('Processed file: ', fileName)
 

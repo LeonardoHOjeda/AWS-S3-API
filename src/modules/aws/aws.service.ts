@@ -91,10 +91,10 @@ export async function uploadFileToS3Service (file: Express.Multer.File, fileName
   return await clientS3.send(command)
 }
 
-export async function uploadMultipleFilesToS3 (file: Express.Multer.File, tenantId: string, uuid: string): Promise <any> {
+export async function uploadMultipleFilesToS3 (file: Express.Multer.File, awsFileName: string, tenantName: string, uuid: string): Promise <any> {
   const params = {
     Bucket: config.AWS.BUCKET_NAME!,
-    Key: `${tenantId}/${uuid}-${file.originalname}`,
+    Key: `${tenantName}/${uuid}${awsFileName}`,
     Body: file.buffer
   }
 
