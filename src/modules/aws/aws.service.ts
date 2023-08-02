@@ -94,7 +94,7 @@ export async function uploadFileToS3Service (file: Express.Multer.File, fileName
 export async function uploadMultipleFilesToS3 (file: Express.Multer.File, awsFileName: string, tenantName: string, uuid: string): Promise <any> {
   const params = {
     Bucket: config.AWS.BUCKET_NAME!,
-    Key: `${tenantName}/${uuid}${awsFileName}`,
+    Key: `${tenantName}/${awsFileName}`,
     Body: file.buffer
   }
 
