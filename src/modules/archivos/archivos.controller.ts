@@ -87,12 +87,7 @@ export const createSingleFile = async (req: Request, res: Response, next: NextFu
 
     console.log('Req file: ', req.file)
 
-    const allowedExtensions = ['.png', '.pdf', '.jpg', '.jpeg', '.gif']
     const fileExtension = path.extname(file!.originalname)
-
-    if (!allowedExtensions.includes(fileExtension)) {
-      throw new HTTPError(400, 'El archivo tiene una extensión no permitida.')
-    }
 
     console.log('Files: ', file)
 
@@ -139,12 +134,7 @@ export const createMultipleFiles: RequestHandler = async (req: Request, res: Res
         throw new HTTPError(400, 'El archivo es demasiado grande.')
       }
 
-      const allowedExtensions = ['.png', '.pdf', '.jpg', '.jpeg', '.gif']
       const fileExtension = path.extname(file.originalname)
-
-      if (!allowedExtensions.includes(fileExtension)) {
-        throw new HTTPError(400, 'El archivo tiene una extensión no permitida.')
-      }
 
       const uuid = uuidv4()
       const fileName = file.originalname
