@@ -1,0 +1,18 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  }, 
+  "extends": [
+    "plugin:vue/vue3-recommended",
+    "@vue/typescript/recommended",
+    "@vue/eslint-config-stardard-with-typescript"
+  ],
+  "plugins": [
+    "vue"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {}
+}
