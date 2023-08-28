@@ -1,7 +1,9 @@
 <template>
-  <SideBar />
-  <div class="sm:ml-64">
-    <router-view />
+  <div class="dark:bg-gray-600">
+    <SideBar />
+    <div class="sm:ml-64">
+      <router-view />
+    </div>
   </div>
 </template>
 
