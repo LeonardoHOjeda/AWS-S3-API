@@ -4,11 +4,9 @@
   >
     <div
       class="relative bg-white px-8 pt-8 pb-6 rounded-xl max-h-[800px] overflow-auto"
+      @click="closeModal"
     >
-      <div
-        class="w-fit absolute top-4 right-6 p-0 m-0 hover:cursor-pointer"
-        @click="closeModal"
-      >
+      <div class="w-fit absolute top-4 right-6 p-0 m-0 hover:cursor-pointer">
         <font-awesome-icon
           icon="fa-solid fa-times"
           class="text-gray-500 hover:text-gray-600"
@@ -47,6 +45,8 @@ defineProps({
 })
 
 const closeModal = () => {
+  console.log('Close Modal')
+
   showModal.value = false
 }
 </script>

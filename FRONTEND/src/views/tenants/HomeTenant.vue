@@ -16,12 +16,8 @@
           Crear Tenant
         </button>
       </div>
-      <ModalComponent
-        v-if="showModal"
-        title="Crear Tenant"
-        @closeModal="closeModal"
-      >
-        <p>Prueba</p>
+      <ModalComponent v-if="showModal" title="Crear Tenant">
+        <p>Slot</p>
       </ModalComponent>
       <DataTable
         v-model:editingRows="editingRows"
@@ -67,10 +63,6 @@ const toast = useToast()
 const showModal = ref(false)
 const tenants = ref<Array<Tenant>>([])
 const editingRows = ref<Tenant[]>([])
-
-const closeModal = () => {
-  showModal.value = false
-}
 
 const onRowEditSave = (event: any) => {
   try {
