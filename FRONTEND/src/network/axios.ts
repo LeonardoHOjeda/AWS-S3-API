@@ -3,12 +3,12 @@
 import axios, { AxiosError } from 'axios'
 
 const handleServerError = (error: AxiosError<any, any>): AxiosError => {
-  console.error('Error Axios: ', error.response)
+  console.log('Error Axios: ', error.response)
 
   if (error.response?.status === 500) {
     const errorMessage =
       error.response?.data?.message || 'Ocurrió un error en el servidor'
-    console.log(errorMessage)
+    console.log('Error en handleServerError: ', errorMessage)
   }
 
   throw error

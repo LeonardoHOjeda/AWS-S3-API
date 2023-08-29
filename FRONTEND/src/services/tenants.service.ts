@@ -7,6 +7,12 @@ class TenantService {
 
     return tenants.data
   }
+
+  async updateTenantById(uuid: number, tenant: Tenant): Promise<Tenant> {
+    const updatedTenant = await instance.put(`/tenants/update/${uuid}`, tenant)
+
+    return updatedTenant.data
+  }
 }
 
 export const tenantService = new TenantService()
