@@ -1,30 +1,11 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express'
-// import { v4 as uuidv4 } from 'uuid'
 import multer from 'multer'
 import { createSingleFile, createMultipleFiles, createPresignedURLtoUploadFile, getFileBytesFromAWSController, getFilesController, getFilesFromAwsController, getSingleDataFileByUUID } from './archivos.controller'
 
 const router = Router()
 
-// const storage = multer.diskStorage({
-//   destination: (_req, _file, cb) => {
-//     cb(null, 'uploads/')
-//   },
-//   filename: (_req, file, cb) => {
-//     const { originalname } = file
-//     cb(null, originalname)
-//   }
-// })
-
 const storage = multer.memoryStorage()
-
-// const fileFilter = (_req: any, file: any, cb: any) => {
-//   if (file.mimetype.split('/')[0] === 'image' && file.mimetype.split('/')[1] === 'pdf') {
-//     cb(null, true)
-//   } else {
-//     throw new HTTPError(400, 'El archivo no es del formato correcto.')
-//   }
-// }
 const uploader = multer({ storage })
 
 // Obtener todos los archivos de la BD

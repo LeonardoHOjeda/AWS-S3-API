@@ -7,6 +7,12 @@ class FilesService {
 
     return files.data
   }
+
+  async deleteFileFromDatabase(uuid: string): Promise<void> {
+    const file = await instance.delete(`/files/${uuid}`)
+
+    return file.data
+  }
 }
 
 export const filesService = new FilesService()

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
+import primeVueThemeTailwind from './theme/primevue'
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
@@ -6,8 +7,10 @@ import router from './router'
 /* PrimeVue */
 import PrimeVue from 'primevue/config'
 import Tailwind from 'primevue/passthrough/tailwind'
-import ToastService from 'primevue/toastservice'
+import { usePassThrough } from "primevue/passthrough";
 
+import ToastService from 'primevue/toastservice'
+import ConfirmationService from 'primevue/confirmationservice';
 
 /* import the fontawesome core */
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -34,6 +37,7 @@ import {
   faCloudArrowUp,
   faDatabase,
   faMagnifyingGlass,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons'
 import { faAws } from '@fortawesome/free-brands-svg-icons'
 
@@ -58,12 +62,23 @@ library.add(
   faCloudArrowUp,
   faDatabase,
   faAws,
-  faMagnifyingGlass
+  faMagnifyingGlass,
+  faTrash
 )
+
+const CustomTailwind = usePassThrough(
+  Tailwind,
+  primeVueThemeTailwind,
+  {
+      merge: true,             // Used to merge PT options. The default is true.
+      useMergeProps: true,    // Whether to use Vue's 'mergeProps' method to merge PT options.
+  }
+);
 
 const app = createApp(App)
 app.component('FontAwesomeIcon', FontAwesomeIcon)
 app.use(router)
-app.use(PrimeVue, { unstyled: true, pt: Tailwind })
+app.use(PrimeVue, { unstyled: true, pt: CustomTailwind })
 app.use(ToastService)
+app.use(ConfirmationService)
 app.mount('#app')

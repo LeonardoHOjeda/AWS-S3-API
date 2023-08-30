@@ -3,7 +3,7 @@
     class="fixed top-0 bottom-0 left-0 right-0 inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-[1201]"
   >
     <div
-      class="relative bg-white px-8 pt-8 pb-6 rounded-xl max-h-[800px] overflow-auto dark:bg-gray-700"
+      class="relative bg-white px-8 pt-8 pb-6 rounded-xl max-h-[800px] overflow-auto dark:bg-gray-700 transition ease-in-out duration-1000"
       @click="closeModal"
     >
       <div class="w-fit absolute top-4 right-6 p-0 m-0 hover:cursor-pointer">
@@ -42,8 +42,6 @@ defineProps({
 })
 
 const closeModal = () => {
-  console.log('Close Modal')
-
   showModal.value = false
 }
 </script>
