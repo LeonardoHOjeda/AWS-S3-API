@@ -14,6 +14,20 @@ const routes = [
     meta: {
       title: 'Tenants'
     }
+  },
+  {
+    path: '/database-files',
+    component: async () => await import('@views/files/db/HomeDBFile.vue'),
+    meta: {
+      title: 'Database Files'
+    }
+  },
+  {
+    path: '/aws-files',
+    component: async () => await import('@views/files/aws/HomeAwsFile.vue'),
+    meta: {
+      title: 'AWS Files'
+    }
   }
 ]
 

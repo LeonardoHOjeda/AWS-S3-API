@@ -48,10 +48,9 @@
         </div>
         <!-- Hijo -->
         <div
-          class="items-center ml-5 rounded-lg overflow-hidden hover:cursor-pointer hover:bg-blue-100 dark:text-white dark:hover:bg-gray-700 duration-500 p-2"
+          class="items-center ml-5 rounded-lg max-h-0 overflow-hidden hover:cursor-pointer hover:bg-blue-100 dark:text-white dark:hover:bg-gray-700 duration-500 py-0"
           :class="{
-            hidden: !isVisibleTenantList,
-            'opacity-0': !isVisibleTenantList
+            'max-h-[100px] py-2': isVisibleTenantList
           }"
         >
           <router-link to="/tenants" class="">
@@ -62,17 +61,61 @@
           </router-link>
         </div>
         <!-- Archivos -->
-        <div
-          class="flex justify-between items-center p-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 dark:text-white dark:hover:bg-gray-300"
-        >
-          <div>
-            <font-awesome-icon icon="fa-solid fa-file-lines" />
-            <router-link to="/" class="ml-3">Archivos</router-link>
+        <div>
+          <!-- Menu Archivos -->
+          <div
+            class="flex justify-between items-center p-2 rounded-lg hover:cursor-pointer hover:bg-blue-200 dark:text-white dark:hover:bg-gray-700 group"
+            @click="toggleFilesList"
+          >
+            <!-- FontAwesomeIcon -->
+            <div>
+              <font-awesome-icon icon="fa-solid fa-file-lines" />
+              <router-link to="/" class="ml-3">Archivos</router-link>
+            </div>
+            <!-- Fin FontAwesomeIcon -->
+            <!-- FontAwesomeIcon Chevron-->
+            <div>
+              <font-awesome-icon
+                icon="justify-end fa-solid fa-chevron-down"
+                class="transition transform duration-300"
+                :class="isVisibleFileList ? 'rotate-180' : ''"
+              />
+            </div>
+            <!-- Fin FontAwesomeIcon Chevron -->
           </div>
-          <div>
-            <font-awesome-icon icon="justify-end fa-solid fa-chevron-down" />
+          <!-- Fin Menu Archivos -->
+          <!-- Menu Lista Archivos Base de Datos -->
+          <div
+            class="items-center ml-5 rounded-lg max-h-0 overflow-hidden hover:cursor-pointer hover:bg-blue-100 dark:text-white dark:hover:bg-gray-700 duration-500 py-0"
+            :class="{
+              'max-h-[100px] py-2': isVisibleFileList
+            }"
+          >
+            <router-link to="/database-files" class="">
+              <div class="">
+                <font-awesome-icon icon="fa-solid fa-database" />
+                Lista Archivos en Base de Datos
+              </div>
+            </router-link>
           </div>
+          <!-- Fin Menu Lista Archivos Base de Datos -->
+          <!-- Menu Lista Archivos AWS -->
+          <div
+            class="items-center ml-5 rounded-lg max-h-0 overflow-hidden hover:cursor-pointer hover:bg-blue-100 dark:text-white dark:hover:bg-gray-700 duration-500 py-0"
+            :class="{
+              'max-h-[100px] py-2': isVisibleFileList
+            }"
+          >
+            <router-link to="/aws-files" class="">
+              <div class="">
+                <font-awesome-icon icon="fa-brands fa-aws" />
+                Lista Archivos en AWS
+              </div>
+            </router-link>
+          </div>
+          <!-- Fin Menu Lista Archivos AWS -->
         </div>
+        <!-- Fin Archivos -->
       </div>
     </div>
     <div class="fixed bottom-0 text-center left-0 p-4 z-10 w-full dark:text-white flex items-center justify-center">
@@ -98,15 +141,36 @@ import { storageService } from '../services/storage.service'
 
 const darkMode = ref(storageService.theme === 'dark')
 const isVisibleTenantList = ref(false)
+const isVisibleFileList = ref(false)
+
+const toogleTenantList = () => {
+  isVisibleTenantList.value = !isVisibleTenantList.value
+  if (isVisibleFileList.value) {
+    isVisibleFileList.value = false
+  }
+}
+
+const toggleFilesList = () => {
+  isVisibleFileList.value = !isVisibleFileList.value
+  if (isVisibleTenantList.value) {
+    isVisibleTenantList.value = false
+  }
+}
 
 watchEffect(() => {
   storageService.theme = darkMode.value ? 'dark' : 'light'
   document.documentElement.classList.toggle('dark', darkMode.value)
 })
-
-const toogleTenantList = () => {
-  isVisibleTenantList.value = !isVisibleTenantList.value
-}
 </script>
 
-<style scoped></style>
+<style scoped>
+.elemento {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.5s ease;
+}
+
+.animar {
+  transition: max-height 0.5s ease;
+}
+</style>
