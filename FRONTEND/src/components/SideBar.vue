@@ -4,12 +4,7 @@
     class="inline-flex items-center p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
   >
     <span class="sr-only">Open sidebar</span>
-    <svg
-      class="w-6 h-6"
-      fill="currentColor"
-      viewBox="0 0 20 20"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
       <path
         clip-rule="evenodd"
         fill-rule="evenodd"
@@ -24,9 +19,7 @@
     aria-label="Sidebar"
   >
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-      <p class="dark:text-white p-2 text-center font-bold">
-        Administrador de Tenants
-      </p>
+      <p class="dark:text-white p-2 text-center font-bold">Administrador de Tenants</p>
       <hr class="mb-3" />
       <div class="font-medium">
         <div
@@ -82,14 +75,9 @@
         </div>
       </div>
     </div>
-    <div
-      class="fixed bottom-0 text-center left-0 p-4 z-10 w-full dark:text-white flex items-center justify-center"
-    >
+    <div class="fixed bottom-0 text-center left-0 p-4 z-10 w-full dark:text-white flex items-center justify-center">
       <span class="mr-2">
-        <font-awesome-icon
-          icon="fas fa-sun"
-          class="text-yellow-500 dark:text-gray-300"
-        />
+        <font-awesome-icon icon="fas fa-sun" class="text-yellow-500 dark:text-gray-300" />
       </span>
       <label class="relative inline-flex items-center cursor-pointer">
         <input v-model="darkMode" type="checkbox" value class="sr-only peer" />
@@ -97,10 +85,7 @@
           class="w-11 h-6 bg-yellow-500 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-yellow-200 dark:peer-focus:ring-gray-500 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-gray-600"
         ></div>
         <span>
-          <font-awesome-icon
-            icon="fas fa-moon"
-            class="text-indigo-600 dark:text-gray-500 ml-2"
-          />
+          <font-awesome-icon icon="fas fa-moon" class="text-indigo-600 dark:text-gray-500 ml-2" />
         </span>
       </label>
     </div>
@@ -109,11 +94,13 @@
 
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
+import { storageService } from '../services/storage.service'
 
-const darkMode = ref(false)
+const darkMode = ref(storageService.theme === 'dark')
 const isVisibleTenantList = ref(false)
 
 watchEffect(() => {
+  storageService.theme = darkMode.value ? 'dark' : 'light'
   document.documentElement.classList.toggle('dark', darkMode.value)
 })
 

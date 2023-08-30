@@ -6,7 +6,7 @@ import router from './router'
 /* PrimeVue */
 import PrimeVue from 'primevue/config'
 import Tailwind from 'primevue/passthrough/tailwind'
-import ToastService from 'primevue/toastservice';
+import ToastService from 'primevue/toastservice'
 
 
 /* import the fontawesome core */
@@ -30,7 +30,8 @@ import {
   faInfoCircle,
   faTriangleExclamation,
   faXmark,
-  faCirclePlus
+  faCirclePlus,
+  faCloudArrowUp
 } from '@fortawesome/free-solid-svg-icons'
 
 /* add icons to the library */
@@ -50,7 +51,8 @@ library.add(
   faInfoCircle,
   faTriangleExclamation,
   faXmark,
-  faCirclePlus
+  faCirclePlus,
+  faCloudArrowUp
 )
 
 const app = createApp(App)

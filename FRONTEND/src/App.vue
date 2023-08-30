@@ -2,7 +2,7 @@
   <div class="dark:bg-gray-600">
     <Toast />
     <SideBar />
-    <div class="sm:ml-64">
+    <div class="sm:ml-64 min-h-screen">
       <router-view />
     </div>
   </div>

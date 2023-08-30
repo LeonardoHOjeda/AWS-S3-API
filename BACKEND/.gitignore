@@ -5,3 +5,5 @@ uploads/*
 downloads/*
 build/
 docker-compose.yml
+package-lock.json
+yarn.lock
