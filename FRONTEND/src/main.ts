@@ -33,6 +33,7 @@ import {
   faCirclePlus,
   faCloudArrowUp,
   faDatabase,
+  faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons'
 import { faAws } from '@fortawesome/free-brands-svg-icons'
 
@@ -56,7 +57,8 @@ library.add(
   faCirclePlus,
   faCloudArrowUp,
   faDatabase,
-  faAws
+  faAws,
+  faMagnifyingGlass
 )
 
 const app = createApp(App)

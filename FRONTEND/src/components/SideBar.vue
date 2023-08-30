@@ -2,6 +2,7 @@
   <button
     type="button"
     class="inline-flex items-center p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+    @click="toogleSideBar"
   >
     <span class="sr-only">Open sidebar</span>
     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -15,7 +16,11 @@
 
   <aside
     id="sidebar-multi-level-sidebar"
-    class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+    class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform"
+    :class="{
+      'translate-x-0 ease-in': isVisibleSideBar,
+      '-translate-x-full ease-out': !isVisibleSideBar
+    }"
     aria-label="Sidebar"
   >
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
@@ -36,7 +41,7 @@
         >
           <div>
             <font-awesome-icon icon="fa-solid fa-building" />
-            <router-link to="/" class="ml-3">Tenants</router-link>
+            <span class="ml-3">Tenants</span>
           </div>
           <div>
             <font-awesome-icon
@@ -136,12 +141,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { Ref, inject, ref, watchEffect } from 'vue'
 import { storageService } from '../services/storage.service'
 
 const darkMode = ref(storageService.theme === 'dark')
 const isVisibleTenantList = ref(false)
 const isVisibleFileList = ref(false)
+const isVisibleSideBar = inject<Ref<boolean>>('isVisibleSideBar')!
 
 const toogleTenantList = () => {
   isVisibleTenantList.value = !isVisibleTenantList.value
@@ -156,6 +162,8 @@ const toggleFilesList = () => {
     isVisibleTenantList.value = false
   }
 }
+
+const toogleSideBar = inject<() => void>('toogleSideBar')!
 
 watchEffect(() => {
   storageService.theme = darkMode.value ? 'dark' : 'light'

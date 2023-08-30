@@ -12,7 +12,9 @@
       "@assets/*": ["./src/assets/*"],
       "@router/*": ["./src/router/*"],
       "@services/*": ["./src/services/*"],
-      "@models/*": ["./src/models/*"]
+      "@models/*": ["./src/models/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@utils/*": ["./src/utils/*"]
       // "@store/*": ["./src/store/*"],
     },
 
