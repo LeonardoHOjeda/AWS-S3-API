@@ -28,7 +28,6 @@ export async function getSingleFileService (uuid: string): Promise<Archivo | nul
 export async function createFileService (data: Omit<Archivo, 'id' | 'createdAt'>): Promise<Archivo> {
   console.log('Data fileeeee: ', data)
   const fileName = Buffer.from(data.nombreArchivo, 'latin1').toString('utf8')
-  // const fileName = data.nombreArchivo.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('ñ', 'n')
   console.log('File name: ', fileName)
 
   const createFile = await prisma.archivo.create({
@@ -43,4 +42,13 @@ export async function createFileService (data: Omit<Archivo, 'id' | 'createdAt'>
   })
 
   return createFile
+}
+
+// ? Eliminar un archivo de la BD
+export async function deleteFileService (uuid: string): Promise<Archivo> {
+  const deleteFile = await prisma.archivo.delete({
+    where: { uuid }
+  })
+
+  return deleteFile
 }

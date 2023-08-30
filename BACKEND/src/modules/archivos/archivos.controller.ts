@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import { PutObjectCommandInput } from '@aws-sdk/client-s3'
 // import fileUpload from 'express-fileupload'
-import { createFileService, getFilesService, getSingleFileService } from './archivos.service'
+import { createFileService, deleteFileService, getFilesService, getSingleFileService } from './archivos.service'
 // import { getFilesService } from './archivos.service'
 import { getTenantByIdService } from '@modules/tenants/tenants.service'
 import config from '@config/config'
@@ -205,6 +205,22 @@ export const createPresignedURLtoUploadFile = async (req: Request, res: Response
     res.json({ presignedURL, key: Key, uuid })
   } catch (error) {
     console.log(error)
+
+    next(error)
+  }
+}
+
+// ! Función para eliminar un archivo de la base de datos
+export const deleteFileController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const uuid = req.params.uuid
+
+    const deletedFile = await deleteFileService(uuid)
+    console.log('Deleted file: ', deletedFile)
+
+    res.json(deletedFile)
+  } catch (error) {
+    console.log('Error en deleteFileController: ', error)
 
     next(error)
   }

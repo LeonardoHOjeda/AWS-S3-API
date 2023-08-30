@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express'
 import multer from 'multer'
-import { createSingleFile, createMultipleFiles, createPresignedURLtoUploadFile, getFileBytesFromAWSController, getFilesController, getFilesFromAwsController, getSingleDataFileByUUID } from './archivos.controller'
+import { createSingleFile, createMultipleFiles, createPresignedURLtoUploadFile, getFileBytesFromAWSController, getFilesController, getFilesFromAwsController, getSingleDataFileByUUID, deleteFileController } from './archivos.controller'
 
 const router = Router()
 
@@ -10,6 +10,7 @@ const uploader = multer({ storage })
 
 // Obtener todos los archivos de la BD
 router.get('/', getFilesController)
+router.get('/single/:uuid', getSingleDataFileByUUID)
 // ? PRESIGNED URL
 // Obtener un archivo de AWS S3 con presigned URL
 router.get('/presignedFile/:folder/:fileName', getFilesFromAwsController)
@@ -23,6 +24,6 @@ router.post('/uploadFile', uploader.single('file'), createSingleFile)
 router.post('/uploadMultipleFiles', uploader.array('file'), createMultipleFiles)
 // Obtener un archivo de AWS S3 (File)
 router.get('/:uuid', getFileBytesFromAWSController)
-router.get('/single/:uuid', getSingleDataFileByUUID)
+router.delete('/:uuid', deleteFileController)
 
 export default router
