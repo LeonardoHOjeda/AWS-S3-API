@@ -59,7 +59,7 @@
           }"
         >
           <router-link to="/tenants" class="">
-            <div class="">
+            <div class="px-2">
               <font-awesome-icon icon="fa-solid fa-list" />
               Lista Tenants
             </div>
@@ -97,7 +97,7 @@
             }"
           >
             <router-link to="/database-files" class="">
-              <div class="">
+              <div class="px-2">
                 <font-awesome-icon icon="fa-solid fa-database" />
                 Lista Archivos en Base de Datos
               </div>
@@ -112,7 +112,7 @@
             }"
           >
             <router-link to="/aws-files" class="">
-              <div class="">
+              <div class="px-2">
                 <font-awesome-icon icon="fa-brands fa-aws" />
                 Lista Archivos en AWS
               </div>

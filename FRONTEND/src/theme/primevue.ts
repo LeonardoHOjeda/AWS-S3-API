@@ -77,7 +77,7 @@ export default {
           'transition duration-200',
           context?.size === 'small' ? 'p-2' : context?.size === 'large' ? 'p-5' : 'p-4', // Size
           context.sorted ? 'bg-blue-50 text-blue-700' : 'bg-slate-50 text-slate-700', // Sort
-          context.sorted ? 'dark:text-white/80 dark:bg-slate-300' : 'dark:text-white/80 dark:bg-gray-900', // Dark Mode
+          context.sorted ? 'dark:text-white/80 dark:bg-slate-700' : 'dark:text-white/80 dark:bg-gray-900', // Dark Mode
           {
             'sticky z-[1]': props.frozen || props.frozen === '', // Frozen Columns
             'border-x border-y': context?.showGridlines,
@@ -136,7 +136,7 @@ export default {
           'm-0 py-3 px-5 bg-transparent',
           'transition duration-200',
           context?.highlighted
-            ? 'text-blue-700 bg-blue-100 dark:text-white/80 dark:bg-blue-300'
+            ? 'text-blue-700 bg-blue-100 dark:text-white/80 dark:bg-blue-700'
             : 'text-gray-600 bg-transparent dark:text-white/80 dark:bg-transparent'
         ]
       }),
@@ -326,6 +326,33 @@ export default {
       ]
     },
     rowgrouptogglericon: 'inline-block w-4 h-4',
-    resizehelper: 'absolute hidden w-px z-10 bg-blue-500 dark:bg-blue-300'
+    resizehelper: 'absolute hidden w-px z-10 bg-blue-500 dark:bg-blue-700'
+  },
+  paginator: {
+    item: ({ context }: any) => ({
+      class: [
+        'relative font-normal cursor-pointer space-nowrap overflow-hidden',
+        'm-0 py-3 px-5 border-none text-gray-600 rounded-none',
+        'transition duration-200',
+        'dark:text-white/80', // Dark Mode
+        {
+          'text-blue-700 bg-blue-50 dark:text-white/80 dark:bg-slate-700': !context.focused && context.selected,
+          'bg-slate-700/40': context.focused && context.selected,
+          'text-gray-600 bg-gray-300 dark:text-white/80 dark:bg-blue-900/40': context.focused && !context.selected
+        }
+      ]
+    }),
+    pagebutton: ({ context }: any) => ({
+      class: [
+        'relative inline-flex items-center justify-center user-none overflow-hidden leading-none',
+        'border-0 text-gray-500 min-w-[3rem] h-12 m-[0.143rem] rounded-md',
+        'transition duration-200',
+        'dark:border-blue-300 dark:text-white', // Dark Mode
+        'focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)]', // Focus
+        {
+          'bg-blue-50 border-blue-50 text-blue-700 dark:bg-slate-700': context.active
+        }
+      ]
+    })
   }
 }
