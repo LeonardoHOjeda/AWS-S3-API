@@ -1,4 +1,5 @@
 import fs from 'fs'
+import * as os from 'os'
 import { Readable } from 'stream'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import {
@@ -75,18 +76,39 @@ class AwsService {
     return uuid
   }
 
-  async downloadFile (fileName: string): Promise<void> {
-    const command = this.getObjectCommand(fileName)
-
+  async downloadFile (key: string): Promise<void> {
+    const command = this.getObjectCommand(key)
     const result = await this.clientS3.send(command)
-
     const readableStream = result.Body as Readable
-    const writeStream = fs.createWriteStream(`./downloads/${fileName}`)
+
+    const downloadsFolder = os.homedir() + '/Downloads'
+
+    if (!fs.existsSync(downloadsFolder)) {
+      fs.mkdirSync(downloadsFolder)
+    }
+
+    const baseFileName = key.split('/')[1]
+    let fileName = baseFileName
+
+    // Verificar si el archivo ya existe en la carpeta de descargas
+    let fileIndex = 0
+    while (fs.existsSync(`${downloadsFolder}/${fileName}`)) {
+      fileIndex++
+      const [name, ext] = baseFileName.split('.')
+      fileName = `${name}_${fileIndex}.${ext}`
+    }
+
+    const filePath = `${downloadsFolder}/${fileName}`
+    console.log('Key: ', key)
+    console.log('Filename: ', fileName)
+
+    const writeStream = fs.createWriteStream(filePath)
+
     readableStream.pipe(writeStream)
   }
 
-  async downloadFileBuffer (uuid: string): Promise<any> {
-    const getFileByUUID = await getSingleFileService(uuid)
+  async downloadFileBuffer (key: string): Promise<any> {
+    const getFileByUUID = await getSingleFileService(key)
 
     const fileName = getFileByUUID?.awsObjectKey
     const command = this.getObjectCommand(fileName!)

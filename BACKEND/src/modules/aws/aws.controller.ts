@@ -14,8 +14,10 @@ export const getFiles = async (_req: Request, res: Response, next: NextFunction)
 }
 
 export const getSingleFile = async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
+  const folder = req.params.folder
   const fileName = req.params.fileName
-  const result = await awsService.getFileByName(fileName)
+  const key = `${folder}/${fileName}`
+  const result = await awsService.getFileByName(key)
 
   res.json(result.$metadata)
 }
@@ -44,11 +46,20 @@ export const uploadFile = async (req: Request, res: Response, next: NextFunction
   }
 }
 
-export const downloadFile = async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
-  const fileName = req.params.fileName
-  await awsService.downloadFile(fileName)
+export const downloadFile = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const folder = req.params.folder
+    const fileName = req.params.fileName
+    const key = `${folder}/${fileName}`
+    console.log('Key: ', key)
 
-  res.json({ message: 'Archivo descargado' })
+    await awsService.downloadFile(key)
+
+    res.json({ message: 'Archivo descargado' })
+  } catch (error) {
+    console.log('Error en downloadFile del modulo AWS: ', error)
+    next(error)
+  }
 }
 
 // ! Eliminar un archivo de AWS S3

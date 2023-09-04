@@ -10,8 +10,8 @@ const uploader = multer({ storage })
 
 router.get('/files', getFiles)
 router.post('/files', uploader.single('file'), uploadFile)
+router.get('/files/:folder/:fileName', getSingleFile)
 router.delete('/files/:folder/:fileName', deleteFile)
-router.get('/files/:fileName', getSingleFile)
-router.get('/files/download/:fileName', downloadFile)
+router.get('/files/download/:folder/:fileName', downloadFile)
 
 export default router
