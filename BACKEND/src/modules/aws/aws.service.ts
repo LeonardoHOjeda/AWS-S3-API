@@ -1,126 +1,142 @@
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { Readable } from 'stream'
-import { S3Client, PutObjectCommand, ListObjectsCommand, GetObjectCommand, PutObjectCommandInput, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import fs from 'fs'
-import config from '../../config/config'
-import { getSingleFileService } from '@modules/archivos/archivos.service'
+import { Readable } from 'stream'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import {
+  S3Client,
+  PutObjectCommand,
+  ListObjectsCommand,
+  GetObjectCommand,
+  PutObjectCommandInput,
+  DeleteObjectCommand,
+  PutObjectCommandOutput
+} from '@aws-sdk/client-s3'
+
+import config from '@config/config'
 import { Tenant } from '@prisma/client'
+import { getSingleFileService } from '@modules/archivos/archivos.service'
 
-const clientS3 = new S3Client({
-  region: config.AWS.BUCKET_REGION,
-  credentials: {
-    accessKeyId: config.AWS.PUBLIC_KEY!,
-    secretAccessKey: config.AWS.SECRET_KEY!
-  }
-})
+class AwsService {
+  private readonly clientS3: S3Client
 
-const getObjectCommand = (fileName: string) => {
-  return new GetObjectCommand({
-    Bucket: config.AWS.BUCKET_NAME!,
-    Key: fileName
-  })
-}
-
-// ? Obtener los archivos que se encuentran en AWS S3
-export async function getFilesFromS3Service (): Promise<any> {
-  const command = new ListObjectsCommand({
-    Bucket: config.AWS.BUCKET_NAME!
-  })
-  return await clientS3.send(command)
-}
-
-// ? Obtener un archivo de AWS S3 por su UUID
-export async function getSingleFileFromS3Service (fileName: string): Promise<any> {
-  const command = getObjectCommand(fileName)
-
-  return await clientS3.send(command)
-}
-
-/** OBTENCION DE ARCHIVOS **/
-
-// ? Obtener un presigned URL de AWS S3 por el UUID del archivo
-export async function getFileSignedUrlFromS3Service (fileName: string): Promise<any> {
-  const command = getObjectCommand(fileName)
-
-  return await getSignedUrl(clientS3, command, { expiresIn: 3600 })
-}
-
-// ? Descargar un archivo de AWS S3 por su UUID
-export async function downloadFileFromS3Service (fileName: string): Promise<any> {
-  const command = getObjectCommand(fileName)
-
-  const result = await clientS3.send(command)
-
-  const readableStream = result.Body as Readable
-  const writeStream = fs.createWriteStream(`./downloads/${fileName}`)
-  readableStream.pipe(writeStream)
-}
-
-// ? Descargar un archivo de AWS
-export async function downloadFileFromS3 (uuid: string): Promise<any> {
-  const getFileByUUID = await getSingleFileService(uuid)
-
-  const fileName = getFileByUUID?.awsObjectKey
-  const command = getObjectCommand(fileName!)
-
-  const data = await clientS3.send(command)
-
-  return data
-}
-
-/** SUBIDA DE ARCHIVOS **/
-// ? Subir un archivo a AWS S3 usando un presigned URL
-export async function uploadURLToS3Service (tenant: Tenant, uploadParams: PutObjectCommandInput): Promise<any> {
-  const command = new PutObjectCommand(uploadParams)
-  const presignedURL = await getSignedUrl(clientS3, command, { expiresIn: tenant.presignedURLTime })
-
-  console.log('Presigned URL: ', presignedURL)
-
-  return presignedURL
-}
-
-// ? Subir un archivo a AWS S3 (File)
-export async function uploadFileToS3Service (file: Express.Multer.File, fileName: string): Promise<any> {
-  const uploadParams = {
-    Bucket: config.AWS.BUCKET_NAME!,
-    Key: fileName,
-    Body: file.buffer
+  constructor () {
+    this.clientS3 = new S3Client({
+      region: config.AWS.BUCKET_REGION,
+      credentials: {
+        accessKeyId: config.AWS.PUBLIC_KEY!,
+        secretAccessKey: config.AWS.SECRET_KEY!
+      }
+    })
   }
 
-  const command = new PutObjectCommand(uploadParams)
-  return await clientS3.send(command)
-}
-
-// ? Subir multiples archivos a AWS S3 (File)
-export async function uploadMultipleFilesToS3 (file: Express.Multer.File, awsFileName: string, tenantName: string, uuid: string): Promise <any> {
-  const params = {
-    Bucket: config.AWS.BUCKET_NAME!,
-    Key: `${tenantName}/${awsFileName}`,
-    Body: file.buffer
+  private getObjectCommand (fileName: string) {
+    return new GetObjectCommand({
+      Bucket: config.AWS.BUCKET_NAME!,
+      Key: fileName
+    })
   }
 
-  const command = new PutObjectCommand(params)
-  await clientS3.send(command)
-  console.log(uuid)
+  async getFiles (): Promise<any> {
+    const command = new ListObjectsCommand({
+      Bucket: config.AWS.BUCKET_NAME!
+    })
 
-  return uuid
-}
-
-// ! Eliminar un archivo de AWS S3
-export async function deleteFileFromS3 (key: string): Promise<any> {
-  const command = new DeleteObjectCommand({
-    Bucket: config.AWS.BUCKET_NAME!,
-    Key: key
-  })
-
-  try {
-    const response = await clientS3.send(command)
-    console.log('Response: ', response)
-  } catch (error) {
-    console.log('Error en deleteFileFromS3: ', error)
+    return await this.clientS3.send(command)
   }
 
-  const data = await clientS3.send(command)
+  async getFileByName (fileName: string): Promise<any> {
+    const command = this.getObjectCommand(fileName)
 
-  return data
+    return await this.clientS3.send(command)
+  }
+
+  async uploadFile (file: Express.Multer.File, fileName: string): Promise<PutObjectCommandOutput> {
+    const uploadParams = {
+      Bucket: config.AWS.BUCKET_NAME!,
+      Key: fileName,
+      Body: file.buffer
+    }
+
+    const command = new PutObjectCommand(uploadParams)
+
+    return await this.clientS3.send(command)
+  }
+
+  async uploadMultipleFiles (file: Express.Multer.File, awsFileName: string, tenantName: string, uuid: string): Promise<string> {
+    const params = {
+      Bucket: config.AWS.BUCKET_NAME!,
+      Key: `${tenantName}/${awsFileName}`,
+      Body: file.buffer
+    }
+
+    const command = new PutObjectCommand(params)
+    await this.clientS3.send(command)
+    console.log(uuid)
+
+    return uuid
+  }
+
+  async downloadFile (fileName: string): Promise<void> {
+    const command = this.getObjectCommand(fileName)
+
+    const result = await this.clientS3.send(command)
+
+    const readableStream = result.Body as Readable
+    const writeStream = fs.createWriteStream(`./downloads/${fileName}`)
+    readableStream.pipe(writeStream)
+  }
+
+  async downloadFileBuffer (uuid: string): Promise<any> {
+    const getFileByUUID = await getSingleFileService(uuid)
+
+    const fileName = getFileByUUID?.awsObjectKey
+    const command = this.getObjectCommand(fileName!)
+
+    const data = await this.clientS3.send(command)
+
+    return data
+  }
+
+  // * PRESIGNED URL
+  async getFileSignedUrl (fileName: string): Promise<string> {
+    const command = this.getObjectCommand(fileName)
+
+    return await getSignedUrl(
+      this.clientS3,
+      command,
+      { expiresIn: 3600 }
+    )
+  }
+
+  async uploadFileWithSignedUrl (tenant: Tenant, uploadParams: PutObjectCommandInput): Promise<string> {
+    const command = new PutObjectCommand(uploadParams)
+    const presignedURL = await getSignedUrl(
+      this.clientS3,
+      command,
+      { expiresIn: tenant.presignedURLTime }
+    )
+
+    console.log('Presigned URL: ', presignedURL)
+
+    return presignedURL
+  }
+
+  async deleteFile (fileName: string): Promise<any> {
+    const command = new DeleteObjectCommand({
+      Bucket: config.AWS.BUCKET_NAME!,
+      Key: fileName
+    })
+
+    try {
+      const response = await this.clientS3.send(command)
+      console.log('Response: ', response)
+    } catch (error) {
+      console.log('Error en deleteFileFromS3: ', error)
+    }
+
+    const data = await this.clientS3.send(command)
+
+    return data
+  }
 }
+
+export const awsService = new AwsService()

@@ -1,33 +1,55 @@
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/strict-boolean-expressions */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { NextFunction, Request, Response } from 'express'
-import { downloadFileFromS3Service, getFilesFromS3Service, getSingleFileFromS3Service, deleteFileFromS3 } from './aws.service'
-// import { HTTPError } from '@middlewares/error_handler'
+import { awsService } from './aws.service'
+import { HTTPError } from '@middlewares/error_handler'
+import path from 'path'
 
-export const getAllFiles = async (_req: Request, res: Response, _next: NextFunction): Promise<any> => {
-  const result = await getFilesFromS3Service()
+export const getFiles = async (_req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const result = await awsService.getFiles()
 
-  res.json(result.Contents)
+    res.json(result.Contents)
+  } catch (error) {
+    console.log('Error en GetFiles del modulo AWS: ', error)
+    next(error)
+  }
 }
 
 export const getSingleFile = async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
   const fileName = req.params.fileName
-  const result = await getSingleFileFromS3Service(fileName)
+  const result = await awsService.getFileByName(fileName)
 
   res.json(result.$metadata)
 }
 
-export const getSingleFileSignedUrl = async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
-  const fileName = req.params.fileName
-  const result = await getSingleFileFromS3Service(fileName)
+export const uploadFile = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const file = req.file
 
-  res.json(result.url)
+    const maxSizeInBytes = 1 * 1024 * 1024 // 1 MB en bytes
+
+    if (file!.size > maxSizeInBytes) {
+      throw new HTTPError(400, 'El archivo es demasiado grande.')
+    }
+
+    console.log('Req file: ', req.file)
+
+    const fileExtension = path.extname(file!.originalname)
+
+    const fileName = `${file!.filename}${fileExtension}`
+    const awsObjectKey = `UploadedFiles/${fileName}`
+
+    const newFile = await awsService.uploadFile(file!, awsObjectKey)
+
+    res.json(newFile)
+  } catch (error) {
+    console.log('Error en uploadFile del modulo AWS: ', error)
+    next(error)
+  }
 }
 
 export const downloadSingleFile = async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
   const fileName = req.params.fileName
-  await downloadFileFromS3Service(fileName)
+  await awsService.downloadFile(fileName)
 
   res.json({ message: 'Archivo descargado' })
 }
@@ -35,7 +57,7 @@ export const downloadSingleFile = async (req: Request, res: Response, _next: Nex
 // ! Eliminar un archivo de AWS S3
 export const deleteFile = async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
   const key = req.params.key
-  const result = await deleteFileFromS3(key)
+  const result = await awsService.deleteFile(key)
 
   res.json(result)
 }

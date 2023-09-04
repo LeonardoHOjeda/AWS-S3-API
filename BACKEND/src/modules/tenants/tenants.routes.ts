@@ -5,9 +5,9 @@ const router = Router()
 
 router.get('/', getTenants)
 router.post('/create', createTenant)
-router.put('/update/:uuid', updateTenant)
 
 // Dynamic Routes
 router.get('/:uuid', getTenantById)
+router.put('/:uuid', updateTenant)
 
 export default router

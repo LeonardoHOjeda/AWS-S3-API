@@ -7,9 +7,9 @@ import { PutObjectCommandInput } from '@aws-sdk/client-s3'
 // import fileUpload from 'express-fileupload'
 import { createFileService, deleteFileService, getFilesService, getSingleFileService } from './archivos.service'
 // import { getFilesService } from './archivos.service'
-import { getTenantByIdService } from '@modules/tenants/tenants.service'
+import { tenantsService } from '@modules/tenants/tenants.service'
 import config from '@config/config'
-import { downloadFileFromS3, getFileSignedUrlFromS3Service, uploadFileToS3Service, uploadMultipleFilesToS3, uploadURLToS3Service } from '@modules/aws/aws.service'
+import { awsService } from '@modules/aws/aws.service'
 import { HTTPError } from '@middlewares/error_handler'
 // import { downloadFileFromS3, getFileSignedUrlFromS3Service, uploadMultipleFilesToS3, uploadURLToS3Service } from '@modules/aws/aws.service'
 
@@ -29,7 +29,7 @@ export const getFilesController = async (_req: Request, res: Response, next: Nex
 export const getFileBytesFromAWSController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const uuid = req.params.uuid
-    const file = await downloadFileFromS3(uuid)
+    const file = await awsService.downloadFileBuffer(uuid)
 
     res.setHeader('Content-Type', file.ContentType)
     res.setHeader('Content-Disposition', `attachment; filename="${file.Key}"`)
@@ -62,7 +62,7 @@ export const getFilesFromAwsController = async (req: Request, res: Response, nex
     const fileName = req.params.fileName
     const path = `${folder}/${fileName}`
 
-    const presignedFile = await getFileSignedUrlFromS3Service(path)
+    const presignedFile = await awsService.getFileSignedUrl(path)
 
     res.json(presignedFile)
   } catch (error) {
@@ -91,14 +91,14 @@ export const createSingleFile = async (req: Request, res: Response, next: NextFu
 
     console.log('Files: ', file)
 
-    const tenant = await getTenantByIdService(tenantId)
+    const tenant = await tenantsService.getTenantByUuid(tenantId)
 
     const awsFileName = `${uuid}${fileExtension}`
     const awsObjectKey = `${tenant.nombre}/${awsFileName}`
     const awsBucket = config.AWS.BUCKET_NAME!
     const awsRegion = config.AWS.BUCKET_REGION!
 
-    await uploadFileToS3Service(file!, awsObjectKey)
+    await awsService.uploadFile(file!, awsObjectKey)
 
     const newFile = await createFileService({
       uuid,
@@ -120,7 +120,7 @@ export const createMultipleFiles: RequestHandler = async (req: Request, res: Res
   try {
     const { tenantId } = req.body
     const files = req.files as unknown as Express.Multer.File[]
-    const tenant = await getTenantByIdService(tenantId)
+    const tenant = await tenantsService.getTenantByUuid(tenantId)
 
     const maxSizeInBytes = 1 * 1024 * 1024 // 1 MB en bytes
 
@@ -151,7 +151,7 @@ export const createMultipleFiles: RequestHandler = async (req: Request, res: Res
       })
 
       // Subir el archivo a AWS
-      const result = await uploadMultipleFilesToS3(file, awsFileName, tenant.nombre, uuid)
+      const result = await awsService.uploadMultipleFiles(file, awsFileName, tenant.nombre, uuid)
 
       console.log('Processed file: ', fileName)
 
@@ -176,7 +176,7 @@ export const createPresignedURLtoUploadFile = async (req: Request, res: Response
     const fileExtension: string = req.query.fileType?.toString() as string
 
     const uuid = uuidv4()
-    const tenant = await getTenantByIdService(tenantId)
+    const tenant = await tenantsService.getTenantByUuid(tenantId)
 
     const Key = `${tenant.nombre}/${uuid}.${fileExtension}`
 
@@ -200,7 +200,7 @@ export const createPresignedURLtoUploadFile = async (req: Request, res: Response
       ContentType: contentType
     }
 
-    const presignedURL = await uploadURLToS3Service(tenant, s3params)
+    const presignedURL = await awsService.uploadFileWithSignedUrl(tenant, s3params)
 
     res.json({ presignedURL, key: Key, uuid })
   } catch (error) {
