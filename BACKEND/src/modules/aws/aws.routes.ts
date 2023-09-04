@@ -4,7 +4,7 @@ import { downloadSingleFile, getAllFiles, getSingleFile } from './aws.controller
 
 const router = Router()
 
-router.get('/upload', getAllFiles)
+router.get('/', getAllFiles)
 router.get('/upload/:fileName', getSingleFile)
 router.get('/download/:fileName', downloadSingleFile)
 // router.post('/upload', uploadFile)

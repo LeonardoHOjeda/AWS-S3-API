@@ -1,13 +1,13 @@
 import { Router } from 'express'
-import { createTenantController, getTenantById as getTenantByIdController, getTenantsController, updateTenant as updateTenantController } from './tenants.controller'
+import { createTenant, getTenantById, getTenants, updateTenant } from './tenants.controller'
 
 const router = Router()
 
-router.get('/', getTenantsController)
-router.get('/:uuid', getTenantByIdController)
+router.get('/', getTenants)
+router.post('/create', createTenant)
+router.put('/update/:uuid', updateTenant)
 
-router.post('/create', createTenantController)
-
-router.put('/update/:uuid', updateTenantController)
+// Dynamic Routes
+router.get('/:uuid', getTenantById)
 
 export default router

@@ -1,6 +1,6 @@
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { Readable } from 'stream'
-import { S3Client, PutObjectCommand, ListObjectsCommand, GetObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3'
+import { S3Client, PutObjectCommand, ListObjectsCommand, GetObjectCommand, PutObjectCommandInput, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import fs from 'fs'
 import config from '../../config/config'
 import { getSingleFileService } from '@modules/archivos/archivos.service'
@@ -91,6 +91,7 @@ export async function uploadFileToS3Service (file: Express.Multer.File, fileName
   return await clientS3.send(command)
 }
 
+// ? Subir multiples archivos a AWS S3 (File)
 export async function uploadMultipleFilesToS3 (file: Express.Multer.File, awsFileName: string, tenantName: string, uuid: string): Promise <any> {
   const params = {
     Bucket: config.AWS.BUCKET_NAME!,
@@ -103,4 +104,23 @@ export async function uploadMultipleFilesToS3 (file: Express.Multer.File, awsFil
   console.log(uuid)
 
   return uuid
+}
+
+// ! Eliminar un archivo de AWS S3
+export async function deleteFileFromS3 (key: string): Promise<any> {
+  const command = new DeleteObjectCommand({
+    Bucket: config.AWS.BUCKET_NAME!,
+    Key: key
+  })
+
+  try {
+    const response = await clientS3.send(command)
+    console.log('Response: ', response)
+  } catch (error) {
+    console.log('Error en deleteFileFromS3: ', error)
+  }
+
+  const data = await clientS3.send(command)
+
+  return data
 }

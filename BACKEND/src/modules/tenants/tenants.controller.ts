@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
-import { createTenantService, getTenantsService, getTenantByIdService, updateTenant as updateTenantService } from './tenants.service'
+import { tenantsService } from './tenants.service'
 import shortUUID from 'short-uuid'
 
-export const getTenantsController = async (_req: Request, res: Response, next: NextFunction) => {
+export const getTenants = async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const tenants = await getTenantsService()
+    const tenants = await tenantsService.getTenants()
 
     res.json(tenants)
   } catch (error) {
@@ -16,7 +16,7 @@ export const getTenantById = async (req: Request, res: Response, next: NextFunct
   try {
     const { uuid } = req.params
 
-    const tenant = await getTenantByIdService(uuid)
+    const tenant = await tenantsService.getTenantByUuid(uuid)
 
     res.json(tenant)
   } catch (error) {
@@ -25,12 +25,12 @@ export const getTenantById = async (req: Request, res: Response, next: NextFunct
   }
 }
 
-export const createTenantController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const createTenant = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const uuid = shortUUID.generate()
 
     const { nombre } = req.body
-    const newTenant = await createTenantService({
+    const newTenant = await tenantsService.createTenant({
       uuid,
       nombre,
       presignedURLTime: 3000
@@ -49,7 +49,7 @@ export const updateTenant = async (req: Request, res: Response, next: NextFuncti
 
     console.log('Tenant data: ', tenantData)
 
-    const updatedTenant = await updateTenantService(uuid, tenantData)
+    const updatedTenant = await tenantsService.updateTenant(uuid, tenantData)
 
     res.json(updatedTenant)
   } catch (error) {
