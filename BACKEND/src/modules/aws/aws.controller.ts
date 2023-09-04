@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { awsService } from './aws.service'
 import { HTTPError } from '@middlewares/error_handler'
-import path from 'path'
 
 export const getFiles = async (_req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
@@ -33,9 +32,7 @@ export const uploadFile = async (req: Request, res: Response, next: NextFunction
 
     console.log('Req file: ', req.file)
 
-    const fileExtension = path.extname(file!.originalname)
-
-    const fileName = `${file!.filename}${fileExtension}`
+    const fileName = file!.originalname
     const awsObjectKey = `UploadedFiles/${fileName}`
 
     const newFile = await awsService.uploadFile(file!, awsObjectKey)
@@ -47,7 +44,7 @@ export const uploadFile = async (req: Request, res: Response, next: NextFunction
   }
 }
 
-export const downloadSingleFile = async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
+export const downloadFile = async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
   const fileName = req.params.fileName
   await awsService.downloadFile(fileName)
 
@@ -56,7 +53,10 @@ export const downloadSingleFile = async (req: Request, res: Response, _next: Nex
 
 // ! Eliminar un archivo de AWS S3
 export const deleteFile = async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
-  const key = req.params.key
+  const folder = req.params.folder
+  const fileName = req.params.fileName
+  const key = `${folder}/${fileName}`
+
   const result = await awsService.deleteFile(key)
 
   res.json(result)
