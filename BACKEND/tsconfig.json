@@ -12,6 +12,7 @@
       "@modules/*": ["modules/*"],
       "@middlewares/*": ["middlewares/*"],
       "@config/*": ["config/*"],
+      "@utils/*": ["utils/*"],
     },
     "typeRoots": ["@types", "node_modules/@types"],
 

@@ -6,6 +6,11 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Sin liberar]
+### Agregado
+- Se agrega endpoint para eliminar un archivo.
+- Se ordenan los archivos por fecha de creación de mas reciente a mas antiguo.
+- Se agrega el nombre del tenant a la hora de consultar los archivos de la BD.
+- Se ordenan los archivos de AWS por fecha de creación de mas reciente a mas antiguo.
 ## [1.0.14] - 18-08-2023
 ### Cambiado
 - Se permite subir cualquier tipo de archivos, antes aceptaba únicamente PDF's e imágenes.

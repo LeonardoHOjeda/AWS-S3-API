@@ -6,7 +6,14 @@ const prisma = new PrismaClient()
 
 // ? Obtener todos los archivos de la BD
 export async function getFilesService (): Promise<Archivo[]> {
-  const getFiles = await prisma.archivo.findMany()
+  const getFiles = await prisma.archivo.findMany({
+    include: {
+      tenant: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
 
   return getFiles
 }
@@ -45,6 +52,7 @@ export async function createFileService (data: Omit<Archivo, 'id' | 'createdAt'>
 }
 
 // ? Eliminar un archivo de la BD
+// TODO Eliminar archivo de AWS S3
 export async function deleteFileService (uuid: string): Promise<Archivo> {
   const deleteFile = await prisma.archivo.delete({
     where: { uuid }
