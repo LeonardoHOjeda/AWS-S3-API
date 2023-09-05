@@ -7,12 +7,14 @@
     "baseUrl": "./src",
     "module": "CommonJS",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "paths": {
-      "@src/*": ["src/*"],
-      "@modules/*": ["modules/*"],
-      "@middlewares/*": ["middlewares/*"],
       "@config/*": ["config/*"],
-      "@utils/*": ["utils/*"],
+      "@docs/*": ["docs/*"],
+      "@middlewares/*": ["middlewares/*"],
+      "@modules/*": ["modules/*"],
+      "@src/*": ["src/*"],
+      "@utils/*": ["utils/*"]
     },
     "typeRoots": ["@types", "node_modules/@types"],
 

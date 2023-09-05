@@ -4,7 +4,7 @@ import { createTenant, getTenantById, getTenants, updateTenant } from './tenants
 const router = Router()
 
 router.get('/', getTenants)
-router.post('/create', createTenant)
+router.post('/', createTenant)
 
 // Dynamic Routes
 router.get('/:uuid', getTenantById)

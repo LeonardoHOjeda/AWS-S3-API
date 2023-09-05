@@ -40,6 +40,10 @@ class TenantsService {
       data
     })
 
+    if (updateTenant === null) {
+      throw new HTTPError(404, 'Tenant no encontrado (AWS)')
+    }
+
     return updateTenant
   }
 }
