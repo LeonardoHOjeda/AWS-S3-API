@@ -75,7 +75,7 @@
             <!-- FontAwesomeIcon -->
             <div>
               <font-awesome-icon icon="fa-solid fa-file-lines" />
-              <router-link to="/" class="ml-3">Archivos</router-link>
+              <span class="ml-3">Archivos</span>
             </div>
             <!-- Fin FontAwesomeIcon -->
             <!-- FontAwesomeIcon Chevron-->

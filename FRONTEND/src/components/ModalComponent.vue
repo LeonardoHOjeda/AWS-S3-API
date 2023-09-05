@@ -22,9 +22,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
-const showModal = ref(false)
+const emit = defineEmits<{
+  (event: 'closeModal'): void
+}>()
 
 defineProps({
   title: {
@@ -42,7 +42,7 @@ defineProps({
 })
 
 const closeModal = () => {
-  showModal.value = false
+  emit('closeModal')
 }
 </script>
 

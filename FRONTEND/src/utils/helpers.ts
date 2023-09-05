@@ -8,3 +8,9 @@ export const formatDate = (date: Date | null | undefined | string): string => {
 
   return `${dia} de ${mes} de ${anio}`
 }
+
+export const bytesToMegabytes = (bytes: number): number => {
+  const megabytes = bytes / (1024 * 1024) // 1 megabyte = 1024 kilobytes, 1 kilobyte = 1024 bytes
+
+  return megabytes
+}
