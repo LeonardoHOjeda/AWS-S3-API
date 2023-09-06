@@ -8,10 +8,12 @@ const router = Router()
 const storage = multer.memoryStorage()
 const uploader = multer({ storage })
 
-router.get('/files', getFiles)
-router.post('/files', uploader.single('file'), uploadFile)
-router.get('/files/:folder/:fileName', getSingleFile)
-router.delete('/files/:folder/:fileName', deleteFile)
-router.get('/files/download/:folder/:fileName', downloadFile)
+router.get('/', getFiles)
+router.post('/', uploader.single('file'), uploadFile)
+
+// Dynamic Routes
+router.get('/:folder/:fileName', getSingleFile)
+router.delete('/:folder/:fileName', deleteFile)
+router.get('/download/:folder/:fileName', downloadFile)
 
 export default router

@@ -13,13 +13,18 @@ export const getFiles = async (_req: Request, res: Response, next: NextFunction)
   }
 }
 
-export const getSingleFile = async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
-  const folder = req.params.folder
-  const fileName = req.params.fileName
-  const key = `${folder}/${fileName}`
-  const result = await awsService.getFileByName(key)
+export const getSingleFile = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+  try {
+    const folder = req.params.folder
+    const fileName = req.params.fileName
+    const key = `${folder}/${fileName}`
+    const result = await awsService.getFileByName(key)
 
-  res.json(result.$metadata)
+    res.json(result.$metadata)
+  } catch (error) {
+    console.log('Error en getSingleFile del modulo AWS: ', error)
+    next(error)
+  }
 }
 
 export const uploadFile = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
