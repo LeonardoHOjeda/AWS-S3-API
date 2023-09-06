@@ -10,6 +10,7 @@
     "resolveJsonModule": true,
     "paths": {
       "@config/*": ["config/*"],
+      "@database/*": ["database/*"],
       "@docs/*": ["docs/*"],
       "@middlewares/*": ["middlewares/*"],
       "@modules/*": ["modules/*"],

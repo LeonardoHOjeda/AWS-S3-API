@@ -1,7 +1,6 @@
 import { HTTPError } from '@middlewares/error_handler'
-import { PrismaClient, Tenant } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { Tenant } from '@prisma/client'
+import { prisma } from '@database/prisma'
 
 class TenantsService {
   async getTenants (): Promise<Tenant[]> {
