@@ -40,7 +40,7 @@
         "operationId": "getTenant",
         "responses": {
           "200": {
-            "description": "Successful operation",
+            "description": "Petición exitosa",
             "content": {
               "application/json": {
                 "schema": {
@@ -117,7 +117,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful operation",
+            "description": "Petición exitosa",
             "content": {
               "application/json": {
                 "example": {
@@ -245,7 +245,7 @@
         "operationId": "getAWS",
         "responses": {
           "200": {
-            "description": "Successful operation",
+            "description": "Petición exitosa",
             "content": {
               "application/json": {
                 "schema": {
@@ -329,7 +329,7 @@
         },
         "responses": {
           "200": {
-            "description": "Operacion exitosa",
+            "description": "Petición exitosa",
             "content": {
               "application/json": {
                 "schema": {
@@ -415,7 +415,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Operacion exitosa",
+            "description": "Petición exitosa",
             "content": {
               "application/json": {
                 "schema": {
@@ -554,7 +554,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Operacion exitosa",
+            "description": "Petición exitosa",
             "content": {
               "application/json": {
                 "schema": {
@@ -582,14 +582,350 @@
           }
         }  
       }
+    },
+    "/files": {
+      "get": {
+        "tags": ["Archivos"],
+        "summary": "Obtener todos los archivos",
+        "description": "Obtener todos los archivos que se encuentran en la Base de datos",
+        "operationId": "downloadFileByUUID",
+        "responses": {
+          "200": {
+            "description": "Petición exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "example": 84
+                      },
+                      "uuid": {
+                        "type": "string",
+                        "example": "f1dd2932-95e4-477f-bd5b-ca4a8b59d4b3"
+                      },
+                      "nombreArchivo": {
+                        "type": "string",
+                        "example": "KIOSKO - NÃMINA.png"
+                      },
+                      "awsObjectKey": {
+                        "type": "string",
+                        "example": "NomiFacil_014/f1dd2932-95e4-477f-bd5b-ca4a8b59d4b3.png"
+                      },
+                      "awsBucket": {
+                        "type": "string",
+                        "example": "nf-repo-dev"
+                      },
+                      "awsRegion": {
+                        "type": "string",
+                        "example": "us-east-1"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "example": "2023-08-14T13:21:06.095Z"
+                      },
+                      "tenantUuid": {
+                        "type": "string",
+                        "example": "oo58dJPPYbhRAEj7mxtXCo"
+                      },
+                      "tenant": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "example": 1
+                          },
+                          "uuid": {
+                            "type": "string",
+                            "example": "oo58dJPPYbhRAEj7mxtXCo"
+                          },
+                          "nombre": {
+                            "type": "string",
+                            "example": "Nomifacil_014"
+                          },
+                          "presignedURLTime": {
+                            "type": "integer",
+                            "example": 3000
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Archivos"],
+        "summary": "Subir un archivo a la base de datos y a AWS", 
+        "description": "Subir un archivo a la base de datos y a AWS",
+        "operationId": "uploadFile",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tenantId": {
+                    "type": "string",
+                    "example": "eUmhZzyGcohWKh92CLuGNc"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Petición exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 96
+                    },
+                    "uuid": {
+                      "type": "string",
+                      "example": "ad1ec9ab-5d1e-48c6-ad6f-390472b3e3d9"
+                    },
+                    "nombreArchivo": {
+                      "type": "string",
+                      "example": "Docker Cheat Sheet.pdf"
+                    },
+                    "awsObjectKey": {
+                      "type": "string",
+                      "example": "Nomifácil_018/ad1ec9ab-5d1e-48c6-ad6f-390472b3e3d9.pdf"
+                    },
+                    "awsBucket": {
+                      "type": "string",
+                      "example": "nf-repo-dev"
+                    },
+                    "awsRegion": {
+                      "type": "string",
+                      "example": "us-east-1"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "example": "2023-09-06T15:10:12.814Z"
+                    },
+                    "tenantUuid": {
+                      "type": "string",
+                      "example": "eUmhZzyGcohWKh92CLuGNc"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant no encontrado (AWS)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tenant no encontrado (AWS)"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El archivo excede el limite permitido (1MB).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "El archivo es demasiado grande."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }  
+      }
+    },
+    "/files/create": {
+      "get": {
+        "tags": ["Archivos"],
+        "summary": "Obtener una presignedURL",
+        "description": "Obtener una presignedURL para subir un archivo a AWS",
+        "operationId": "getPresignedURLUpload",
+        "parameters": [
+          {
+            "name": "folder",
+            "in": "path",
+            "description": "Nombre del folder donde se encuentra el archivo",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileName",
+            "in": "path",
+            "description": "Nombre del archivo",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Petición exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "presignedURL": {
+                      "type": "string",
+                      "example": "https://devsolutions-mx-storage.s3.us-east-1.amazonaws.com/Nomdiez/e8ef67fb-5778-4917-b46d-f3c2e521c97d.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAU75VWHSTURBDGZPN%2F20230906%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230906T213202Z&X-Amz-Expires=3000&X-Amz-Signature=5341faac1758b973c6b4d6e99ab186a15e9a01b7154916ff62d985bcdc3c90b8&X-Amz-SignedHeaders=host&x-id=PutObject"
+                    },
+                    "key": {
+                      "type": "string",
+                      "example": "Nomdiez/e8ef67fb-5778-4917-b46d-f3c2e521c97d.pdf"
+                    },
+                    "uuid": {
+                      "type": "string",
+                      "example": "e8ef67fb-5778-4917-b46d-f3c2e521c97d"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant no encontrado (AWS)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tenant no encontrado (AWS)"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/multi-upload": {
+      "get": {
+        "tags": ["Archivos"],
+        "summary": "Subir múltiples archivos",
+        "description": "Subir múltiples archivos a la base de datos y a AWS",
+        "operationId": "uploadMultipleFiles",
+        "parameters": [
+          {
+            "name": "folder",
+            "in": "path",
+            "description": "Nombre del folder donde se encuentra el archivo",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileName",
+            "in": "path",
+            "description": "Nombre del archivo",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Petición exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "presignedURL": {
+                      "type": "string",
+                      "example": "https://devsolutions-mx-storage.s3.us-east-1.amazonaws.com/Nomdiez/e8ef67fb-5778-4917-b46d-f3c2e521c97d.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAU75VWHSTURBDGZPN%2F20230906%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230906T213202Z&X-Amz-Expires=3000&X-Amz-Signature=5341faac1758b973c6b4d6e99ab186a15e9a01b7154916ff62d985bcdc3c90b8&X-Amz-SignedHeaders=host&x-id=PutObject"
+                    },
+                    "key": {
+                      "type": "string",
+                      "example": "Nomdiez/e8ef67fb-5778-4917-b46d-f3c2e521c97d.pdf"
+                    },
+                    "uuid": {
+                      "type": "string",
+                      "example": "e8ef67fb-5778-4917-b46d-f3c2e521c97d"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant no encontrado (AWS)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tenant no encontrado (AWS)"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
       "Tenant": {
         "required": [
-          "nombre",
-          "photoUrls"
+          "nombre"
         ],
         "type": "object",
         "properties": {
