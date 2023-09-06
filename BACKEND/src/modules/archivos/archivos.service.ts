@@ -46,16 +46,15 @@ class ArchivosService {
 
     return createFile
   }
+
+  // TODO Eliminar archivo de AWS S3
+  async deleteFile (uuid: string): Promise<Archivo> {
+    const deleteFile = await prisma.archivo.delete({
+      where: { uuid }
+    })
+
+    return deleteFile
+  }
 }
 
 export const archivosService = new ArchivosService()
-
-// ? Eliminar un archivo de la BD
-// TODO Eliminar archivo de AWS S3
-export async function deleteFileService (uuid: string): Promise<Archivo> {
-  const deleteFile = await prisma.archivo.delete({
-    where: { uuid }
-  })
-
-  return deleteFile
-}
