@@ -14,7 +14,8 @@ import {
 
 import config from '@config/config'
 import { Tenant } from '@prisma/client'
-import { getSingleFileService } from '@modules/archivos/archivos.service'
+import { archivosService } from '@modules/archivos/archivos.service'
+import { HTTPError } from '@middlewares/error_handler'
 
 class AwsService {
   private readonly clientS3: S3Client
@@ -46,8 +47,14 @@ class AwsService {
 
   async getFileByName (fileName: string): Promise<any> {
     const command = this.getObjectCommand(fileName)
-
-    return await this.clientS3.send(command)
+    try {
+      return await this.clientS3.send(command)
+    } catch (error: any) {
+      if (error.$metadata.httpStatusCode === 404) {
+        throw new HTTPError(404, 'No se encontró el archivo')
+      }
+      throw error
+    }
   }
 
   async uploadFile (file: Express.Multer.File, fileName: string): Promise<PutObjectCommandOutput> {
@@ -77,38 +84,45 @@ class AwsService {
   }
 
   async downloadFile (key: string): Promise<void> {
-    const command = this.getObjectCommand(key)
-    const result = await this.clientS3.send(command)
-    const readableStream = result.Body as Readable
+    try {
+      const command = this.getObjectCommand(key)
+      const result = await this.clientS3.send(command)
+      const readableStream = result.Body as Readable
 
-    const downloadsFolder = os.homedir() + '/Downloads'
+      const downloadsFolder = os.homedir() + '/Downloads'
 
-    if (!fs.existsSync(downloadsFolder)) {
-      fs.mkdirSync(downloadsFolder)
+      if (!fs.existsSync(downloadsFolder)) {
+        fs.mkdirSync(downloadsFolder)
+      }
+
+      const baseFileName = key.split('/')[1]
+      let fileName = baseFileName
+
+      // Verificar si el archivo ya existe en la carpeta de descargas
+      let fileIndex = 0
+      while (fs.existsSync(`${downloadsFolder}/${fileName}`)) {
+        fileIndex++
+        const [name, ext] = baseFileName.split('.')
+        fileName = `${name}_${fileIndex}.${ext}`
+      }
+
+      const filePath = `${downloadsFolder}/${fileName}`
+      console.log('Key: ', key)
+      console.log('Filename: ', fileName)
+
+      const writeStream = fs.createWriteStream(filePath)
+
+      readableStream.pipe(writeStream)
+    } catch (error: any) {
+      if (error.$metadata.httpStatusCode === 404) {
+        throw new HTTPError(404, 'No se encontró el archivo')
+      }
+      throw error
     }
-
-    const baseFileName = key.split('/')[1]
-    let fileName = baseFileName
-
-    // Verificar si el archivo ya existe en la carpeta de descargas
-    let fileIndex = 0
-    while (fs.existsSync(`${downloadsFolder}/${fileName}`)) {
-      fileIndex++
-      const [name, ext] = baseFileName.split('.')
-      fileName = `${name}_${fileIndex}.${ext}`
-    }
-
-    const filePath = `${downloadsFolder}/${fileName}`
-    console.log('Key: ', key)
-    console.log('Filename: ', fileName)
-
-    const writeStream = fs.createWriteStream(filePath)
-
-    readableStream.pipe(writeStream)
   }
 
   async downloadFileBuffer (key: string): Promise<any> {
-    const getFileByUUID = await getSingleFileService(key)
+    const getFileByUUID = await archivosService.getFileByUuid(key)
 
     const fileName = getFileByUUID?.awsObjectKey
     const command = this.getObjectCommand(fileName!)

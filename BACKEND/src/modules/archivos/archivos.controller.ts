@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import { PutObjectCommandInput } from '@aws-sdk/client-s3'
 // import fileUpload from 'express-fileupload'
-import { createFileService, deleteFileService, getFilesService, getSingleFileService } from './archivos.service'
+import { archivosService, deleteFileService } from './archivos.service'
 // import { getFilesService } from './archivos.service'
 import { tenantsService } from '@modules/tenants/tenants.service'
 import config from '@config/config'
@@ -15,7 +15,7 @@ import { HTTPError } from '@middlewares/error_handler'
 
 export const getFilesController = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const files = await getFilesService()
+    const files = await archivosService.getFiles()
 
     res.json(files)
   } catch (error) {
@@ -44,7 +44,7 @@ export const getFileBytesFromAWSController = async (req: Request, res: Response,
 export const getSingleDataFileByUUID = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const uuid = req.params.uuid
-    const fileData = await getSingleFileService(uuid)
+    const fileData = await archivosService.getFileByUuid(uuid)
 
     res.json(fileData)
   } catch (error) {
@@ -100,7 +100,7 @@ export const createSingleFile = async (req: Request, res: Response, next: NextFu
 
     await awsService.uploadFile(file!, awsObjectKey)
 
-    const newFile = await createFileService({
+    const newFile = await archivosService.createFile({
       uuid,
       nombreArchivo: file!.originalname,
       awsObjectKey,
@@ -141,7 +141,7 @@ export const createMultipleFiles: RequestHandler = async (req: Request, res: Res
       const awsFileName = `${uuid}${fileExtension}`
 
       // Subir informacion del archivo a la base de datos
-      await createFileService({
+      await archivosService.createFile({
         uuid,
         nombreArchivo: fileName,
         awsObjectKey: `${tenant.nombre}/${awsFileName}`,
