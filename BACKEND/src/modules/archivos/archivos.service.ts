@@ -49,6 +49,10 @@ class ArchivosService {
 
   // TODO Eliminar archivo de AWS S3
   async deleteFile (uuid: string): Promise<Archivo> {
+    const file = await this.getFileByUuid(uuid)
+    if (file === null) {
+      throw new HTTPError(404, 'No se encontró el archivo')
+    }
     const deleteFile = await prisma.archivo.delete({
       where: { uuid }
     })

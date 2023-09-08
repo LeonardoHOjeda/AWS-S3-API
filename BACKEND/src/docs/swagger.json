@@ -588,7 +588,7 @@
         "tags": ["Archivos"],
         "summary": "Obtener todos los archivos",
         "description": "Obtener todos los archivos que se encuentran en la Base de datos",
-        "operationId": "downloadFileByUUID",
+        "operationId": "downloadFiles",
         "responses": {
           "200": {
             "description": "Petición exitosa",
@@ -772,10 +772,180 @@
         }  
       }
     },
+    "/files/{uuid}": {
+      "get": {
+        "tags": ["Archivos"],
+        "summary": "Obtener información de un archivo",
+        "description": "Obtener información de un archivo por su UUID",
+        "operationId": "getFileByUUID",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "description": "UUID del archivo que se quiere obtener (sin la extension)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Petición exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 84
+                    },
+                    "uuid": {
+                      "type": "string",
+                      "example": "f1dd2932-95e4-477f-bd5b-ca4a8b59d4b3"
+                    },
+                    "nombreArchivo": {
+                      "type": "string",
+                      "example": "KIOSKO - NÃMINA.png"
+                    },
+                    "awsObjectKey": {
+                      "type": "string",
+                      "example": "NomiFacil_014/f1dd2932-95e4-477f-bd5b-ca4a8b59d4b3.png"
+                    },
+                    "awsBucket": {
+                      "type": "string",
+                      "example": "devsolutions-mx-storage"
+                    },
+                    "awsRegion": {
+                      "type": "string",
+                      "example": "us-east-1"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "example": "2023-08-14T13:21:06.095Z"
+                    },
+                    "tenantUuid": {
+                      "type": "string",
+                      "example": "oo58dJPPYbhRAEj7mxtXCo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Archivo no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No se encontró el archivo"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Archivos"],
+        "summary": "Eliminar un archivo",
+        "description": "Eliminar un archivo de la base de datos",
+        "operationId": "deleteFile",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "example": "2d3b31d8-ccf9-4557-a5ca-bc1fab54899a",
+            "description": "UUID del archivo que se quiere eliminar (sin la extension)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo eliminado con éxito",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 75
+                    },
+                    "uuid": {
+                      "type": "string",
+                      "example": "2d3b31d8-ccf9-4557-a5ca-bc1fab54899a"
+                    },
+                    "nombreArchivo": {
+                      "type": "string",
+                      "example": "Manual para insertar TENANTS.pdf"
+                    },
+                    "awsObjectKey": {
+                      "type": "string",
+                      "example": "NomiFacil_014/2d3b31d8-ccf9-4557-a5ca-bc1fab54899a.pdf"
+                    },
+                    "awsBucket": {
+                      "type": "string",
+                      "example": "devsolutions-mx-storage"
+                    },
+                    "awsRegion": {
+                      "type": "string",
+                      "example": "us-east-1"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "example": "2023-08-02T11:45:20.307Z"
+                    },
+                    "tenantUuid": {
+                      "type": "string",
+                      "example": "oo58dJPPYbhRAEj7mxtXCo"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Archivo no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No se encontró el archivo"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+      }
+    },
     "/files/create": {
       "get": {
         "tags": ["Archivos"],
-        "summary": "Obtener una presignedURL",
+        "summary": "Obtener una presignedURL para subir archivos",
         "description": "Obtener una presignedURL para subir un archivo a AWS",
         "operationId": "getPresignedURLUpload",
         "parameters": [
@@ -847,11 +1017,101 @@
       }
     },
     "/files/multi-upload": {
-      "get": {
+      "post": {
         "tags": ["Archivos"],
         "summary": "Subir múltiples archivos",
         "description": "Subir múltiples archivos a la base de datos y a AWS",
         "operationId": "uploadMultipleFiles",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tenantId": {
+                    "type": "string",
+                    "example": "eUmhZzyGcohWKh92CLuGNc"
+                  },
+                  "file": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Petición exitosa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "example": [
+                      "b0fe46de-b27f-4ac1-8769-8ee36505da81",
+                      "a1ef48ee-1940-4657-9c0c-e968536120a0",
+                      "1c34c02a-97a6-4385-9b66-3e03dbad1ae5"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant no encontrado (AWS)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 404
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Tenant no encontrado (AWS)"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Un archivo excede el limite permitido (1MB).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "El archivo es demasiado grande."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/presignedUrl/{folder}/{fileName}": {
+      "get": {
+        "tags": ["Archivos"],
+        "summary": "Obtener una presignedURL para visualizar los archivos",
+        "description": "Obtener una presignedURL para visualizar los archivos con una liga de AWS",
+        "operationId": "getPresignedURL",
         "parameters": [
           {
             "name": "folder",
@@ -874,45 +1134,12 @@
         ],
         "responses": {
           "200": {
-            "description": "Petición exitosa",
+            "description": "OK",
             "content": {
-              "application/json": {
+              "text/plain": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "presignedURL": {
-                      "type": "string",
-                      "example": "https://devsolutions-mx-storage.s3.us-east-1.amazonaws.com/Nomdiez/e8ef67fb-5778-4917-b46d-f3c2e521c97d.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAU75VWHSTURBDGZPN%2F20230906%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230906T213202Z&X-Amz-Expires=3000&X-Amz-Signature=5341faac1758b973c6b4d6e99ab186a15e9a01b7154916ff62d985bcdc3c90b8&X-Amz-SignedHeaders=host&x-id=PutObject"
-                    },
-                    "key": {
-                      "type": "string",
-                      "example": "Nomdiez/e8ef67fb-5778-4917-b46d-f3c2e521c97d.pdf"
-                    },
-                    "uuid": {
-                      "type": "string",
-                      "example": "e8ef67fb-5778-4917-b46d-f3c2e521c97d"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Tenant no encontrado (AWS)",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "integer",
-                      "example": 404
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Tenant no encontrado (AWS)"
-                    }
-                  }
+                  "type": "string",
+                  "example": "\"https://devsolutions-mx-storage.s3.us-east-1.amazonaws.com/NomiFacil_014/cda348be-9bff-4612-8aed-afe527c5b36f.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIAU75VWHSTURBDGZPN%2F20230908%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230908T005452Z&X-Amz-Expires=3600&X-Amz-Signature=63342c42db388a605f1177792195802d08f4cfecd0a3efa2a68e7755f5f7848f&X-Amz-SignedHeaders=host&x-id=GetObject\""
                 }
               }
             }
